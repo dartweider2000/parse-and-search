@@ -62,19 +62,28 @@ const urlQueue = ['/'];
          //console.log(...(parthList.join('') === '.html' ? ['index.html'] : parthList));
          await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), content);
 
-         const {staticHrefList, urlHrefList} = await page.evaluate(() => {
+         const {staticHrefList, urlHrefList, imgSwiperList} = await page.evaluate(() => {
             let linkHrefList = [...document.querySelectorAll('link[href]')].map(el => el.getAttribute('href')).filter(href => href[0] === '/');
-
+            let imgSrcList = [...document.querySelectorAll('img[src]')].map(el => el.getAttribute('src')).filter(src => src[0] === '/');
             let scriptSrcList = [...document.querySelectorAll('script[src]')].map(el => el.getAttribute('src')).filter(src => src[0] === '/');
             let urlHrefList = [...document.querySelectorAll('a[href]')].map(el => el.getAttribute('href')).filter(href => href[0] === '/');
+            let imgSwiperList = []
 
-            const staticHrefList = [...new Set([...linkHrefList, ...scriptSrcList])];
+            if(document.querySelector('.swiper-wrapper')){
+               const childList = [...document.querySelector('.swiper-wrapper').children];
+
+               imgSwiperList = childList.map(el => {
+                  const str = el.style.backgroundImage;
+
+                  return str.slice(5, str.length - 2);
+               });
+            }
+
+            const staticHrefList = [...new Set([...linkHrefList, ...scriptSrcList, ...imgSrcList, ...imgSwiperList])];
             urlHrefList = [...new Set(urlHrefList)]; 
 
             return {staticHrefList, urlHrefList};
          });
-
-         //console.log('-------------------');
 
          // console.log(staticHrefList);
          // console.log(urlHrefList);
