@@ -1,0 +1,7 @@
+@font-face {
+	font-weight: 900;
+	font-family: 'Font Awesome 5 Free';
+	font-style: normal;
+	font-display: block;
+	src: url('/static/fa-solid-900.woff2') format('woff2'), url('/static/fa-solid-900.woff') format('woff');
+}

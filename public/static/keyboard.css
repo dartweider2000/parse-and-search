@@ -1,0 +1,183 @@
+@import 'colors.css';
+
+.visually-hidden {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	margin: -1px !important;
+	padding: 0 !important;
+	overflow: hidden !important;
+	border: 0 !important;
+	clip: rect(0 0 0 0) !important;
+}
+
+.keyboard__icon--active path {
+	fill: var(--main-text-color);
+}
+
+.keyboard,
+.keyboard * {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.keyboard {
+	position: fixed;
+	z-index: 100;
+	bottom: 5px;
+	right: 5px;
+	padding: 10px 15px;
+	width: -moz-max-content;
+	width: max-content;
+	height: max-content;
+	border: 1px solid #e4e4e4;
+	background-color: var(--main-bg-color);
+}
+
+.keyboard__header {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-box-pack: justify;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+	margin-bottom: 10px;
+	cursor: move;
+}
+
+.keyboard__name {
+	font-size: 18px;
+	color: var(--main-text-color);
+}
+
+.keyboard__close {
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	font-size: 24px;
+	line-height: 1;
+	font-weight: 700;
+	color: var(--main-text-color);
+}
+
+.keyboard__line {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+}
+
+.keyboard__line + .keyboard__line {
+	margin-top: 3px;
+}
+
+.keyboard__button {
+	font-size: 16px;
+	background-color: var(--results-videos__item-color);
+	color: var(--main-text-color);
+	border: none;
+	-webkit-transition: 0.3s;
+	-o-transition: 0.3s;
+	transition: 0.3s;
+}
+
+.keyboard__hidden {
+	display: none;
+}
+
+.keyboard__button:active {
+	-webkit-box-shadow: inset 0 0 20px 10px var(--bg-active-keyword);
+	box-shadow: inset 0 0 20px 10px var(--bg-active-keyword);
+}
+
+.keyboard__button--active {
+	background-color: var(--bg-hover-keyword);
+}
+
+.keyboard__button:hover {
+	background-color: var(--bg-hover-keyword);
+}
+
+.keyboard__button + .keyboard__button {
+	margin-left: 3px;
+}
+
+.keyboard__letter {
+	width: 29px;
+	height: 29px;
+}
+
+.keyboard__backspace {
+	height: 29px;
+	width: 40px;
+}
+
+.keyboard__enter {
+	height: 29px;
+	width: 50px;
+}
+
+.keyboard__caps {
+	height: 29px;
+	width: 40px;
+}
+
+.keyboard__shift {
+	height: 29px;
+	width: 40px;
+}
+
+.keyboard__ctrl-alt {
+	height: 29px;
+	max-width: 75px;
+	width: 100%;
+}
+
+.keyboard__lang {
+	height: 29px;
+	max-width: 29px;
+	width: 100%;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+}
+
+.keyboard__svg {
+	width: 20px;
+	height: 20px;
+}
+
+.keyboard__svg path {
+	fill: var(--main-text-color);
+}
+
+.keyboard__space {
+	height: 29px;
+	width: 100%;
+}
+
+@media (max-width: 990px) {
+	.keyboard__icon {
+		display: none;
+	}
+
+	.microphone__icon {
+		display: none;
+	}
+}
