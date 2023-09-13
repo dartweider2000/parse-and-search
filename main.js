@@ -1,15 +1,12 @@
 import puppeteer from "puppeteer";
-import fs, {promises} from 'fs'
 import os from 'os'
 import path from "path";
-import https from 'https'
-import axios from "axios";
 import { getDataAndWriteData, writeData } from "./fille-system-actions.js";
 
-const { writeFile } = promises;
 
 const baseUrl = 'https://involtago.com';
 const htmlDir = 'views';
+const staticDir = 'public';
 
 //const urlMap = {
    // 'main': baseUrl,
@@ -48,6 +45,21 @@ const urlQueue = [baseUrl];
    //console.log(parthList);
    //console.log(...(parthList.join('') === '.html' ? ['index.html'] : parthList));
    await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), content);
+
+   const {staticHrefList, urlHrefList} = await page.evaluate(() => {
+      let linkHrefList = [...document.querySelectorAll('link')].map(el => el.getAttribute('href'));
+
+      let scriptSrcList = [...document.querySelectorAll('script[src]')].map(el => el.getAttribute('src'));
+      let urlHrefList = [...document.querySelectorAll('a')].map(el => el.getAttribute('href')).filter(href => href[0] === '/');
+
+      const staticHrefList = [...new Set([...linkHrefList, ...scriptSrcList])];
+      urlHrefList = [...new Set(urlHrefList)]; 
+
+      return {staticHrefList, urlHrefList};
+   });
+
+   console.log(staticHrefList);
+   console.log(urlHrefList);
 
    await browser.close();
 })()
@@ -177,8 +189,6 @@ const items = [];
 
 //    await browser.close();
 // })()
-
-const staticFiles = 'public';
 
 // (async () => {
 //    const browser = await puppeteer.launch({'headless': 'new'});

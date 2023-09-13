@@ -31,8 +31,9 @@ const writeData = async (filePath, data) => {
       const dirPath = filePath.slice(0, filePath.lastIndexOf(path.sep));
 
       await fs.promises.mkdir(dirPath, {'recursive': true});
-   }finally{
       await fs.promises.writeFile(filePath, data);
+   }finally{
+      //await fs.promises.writeFile(filePath, data);
    }
 }
 
