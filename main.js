@@ -4,7 +4,7 @@ import os from 'os'
 import path from "path";
 import https from 'https'
 import axios from "axios";
-import { getDataAndWriteData } from "./fille-system-actions.js";
+import { getDataAndWriteData, writeData } from "./fille-system-actions.js";
 
 const { writeFile } = promises;
 
@@ -22,7 +22,7 @@ const htmlDir = 'views';
    // 'blog-en': `${baseUrl}/en/blog`,
 //}
 
-const urlMap = new Map();
+const urlSet = new Set();
 
 const urlQueue = [baseUrl];
 
@@ -37,13 +37,19 @@ const urlQueue = [baseUrl];
          return;
 
       url = urlQueue.shift();
-   }while(urlMap.has(url));
-
+   }while(urlSet.has(url));
    
+   urlSet.add(url)
+
    await page.goto(url);
    const content = await page.content();
 
+   let parthList = (url += '.html').replace(baseUrl, '').split('/');
+   //console.log(parthList);
+   //console.log(...(parthList.join('') === '.html' ? ['index.html'] : parthList));
+   await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), content);
 
+   await browser.close();
 })()
 
 
@@ -207,7 +213,7 @@ const staticFiles = 'public';
 //    await browser.close();
 // })()
 
-(async () => {
-   console.log(path.resolve('src'));
-})()
+// (async () => {
+//    console.log(path.resolve('src'));
+// })()
 

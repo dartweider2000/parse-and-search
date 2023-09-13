@@ -32,7 +32,7 @@ const writeData = async (filePath, data) => {
 
       await fs.promises.mkdir(dirPath, {'recursive': true});
    }finally{
-      await writeData(filePath, data);
+      await fs.promises.writeFile(filePath, data);
    }
 }
 
@@ -41,4 +41,4 @@ const getDataAndWriteData = async (url, filePath) => {
    await writeData(filePath, data);
 }
 
-export { getDataAndWriteData };
+export { getDataAndWriteData, writeData };
