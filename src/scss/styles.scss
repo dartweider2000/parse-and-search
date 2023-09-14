@@ -1,3 +1,39 @@
-body{
-   
+
+#__next{
+   position: relative;
+}
+
+body{ 
+   overflow: auto !important;
+}
+
+main{
+   display: none;
+}
+
+.gsc-control-wrapper-cse{
+   position: static !important;
+}
+
+#___gcse_0{
+   // display: grid;
+   // height: 100vh;
+   //margin-top: 100px;
+   position: static !important;
+}
+
+.gsc-results-wrapper-overlay{
+   visibility: visible;
+   position: static !important;
+}
+
+.gsc-modal-background-image{
+   display: none !important;
+   visibility: hidden;
+   position: static !important;
+}
+
+
+form.gsc-search-box{
+   display: none !important;
 }

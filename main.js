@@ -55,10 +55,18 @@ const urlQueue = ['/'];
 
             const regExp = /<div id="__next" data-reactroot="">[\d\D]*<\/div>/ig;
 
+            //<link rel="stylesheet" href="/my/google-custom-search.css"/>
+
             let root = content.match(regExp)[0];
 
-            content = content.replace(regExp, root + '<div class="gcse-search"></div>');
-            content = content.replace(/<\/body>/ig, '<script async src="https://cse.google.com/cse.js?cx=c2d33ea0d202b48fc"></script></body>');
+            content = content.replace(regExp, root + '<div class="gcse-searchresults-only"></div>');
+            content = content.replace(/<\/body>/ig, `
+               <script src="https://cse.google.com/cse.js?cx=c2d33ea0d202b48fc"></script>
+               <script src="/my/google-custom-search.js"></script>
+               </body>
+            `);
+            content = content.replace(/<\/head>/ig, '<link rel="stylesheet" href="/my/google-custom-search.css"/></head>');
+            content = content.replace(/{\s*"q"\s*:\s*"[\d\D]*?"\s*}/ig, JSON.stringify({q: ''}));
 
             console.log(content);
          }

@@ -7,7 +7,7 @@
   "scripts": {
     "parse": "node main.js",
     "serve": "nodemon server.js",
-    "dev": "webpack --mode=development"
+    "dev": "webpack --mode=production"
   },
   "keywords": [],
   "author": "",
