@@ -65,4 +65,4 @@ const getDataAndWriteData = async (url, filePath) => {
    return staticList || [];
 }
 
-export { getDataAndWriteData, writeData, findUrlFormString };
+export { getDataAndWriteData, writeData, findUrlFormString, getData };
