@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import os from 'os'
 import path from "path";
-import { getDataAndWriteData, writeData } from "./fille-system-actions.js";
+import { findUrlFormString, getDataAndWriteData, writeData } from "./fille-system-actions.js";
 
 
 const baseUrl = 'https://involtago.com';
@@ -22,7 +22,7 @@ const staticDir = 'public';
 const urlSet = new Set();
 const staticSet = new Set();
 
-const urlQueue = ['/'];
+const urlQueue = ['/blog/starting-a-course'];//['/'];
 
 (async () => {
    const browser = await puppeteer.launch({'headless': 'new'});
@@ -30,7 +30,7 @@ const urlQueue = ['/'];
 
    let url;
 
-   up: while(urlQueue.length){
+   //up: while(urlQueue.length){
 
       try{
 
@@ -40,7 +40,7 @@ const urlQueue = ['/'];
 
          do{
             if(!urlQueue.length)
-               break up;
+               break;//break up;
 
             url = urlQueue.shift();
          }while(urlSet.has(url));
@@ -48,6 +48,9 @@ const urlQueue = ['/'];
          //console.log(url);
          
          urlSet.add(url)
+
+         // if(url == '/blog/first-art-skate-park')
+         //    throw new Error('wait for a long');
 
          //console.log(`${baseUrl}${url}`);
          await page.goto(`${baseUrl}${url}`);
@@ -63,45 +66,92 @@ const urlQueue = ['/'];
          await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), content);
 
          const {staticHrefList, urlHrefList, imgSwiperList} = await page.evaluate(() => {
-            let linkHrefList = [...document.querySelectorAll('link[href]')].map(el => el.getAttribute('href')).filter(href => href[0] === '/');
-            let imgSrcList = [...document.querySelectorAll('img[src]')].map(el => el.getAttribute('src')).filter(src => src[0] === '/');
-            let scriptSrcList = [...document.querySelectorAll('script[src]')].map(el => el.getAttribute('src')).filter(src => src[0] === '/');
+            //let linkHrefList = [...document.querySelectorAll('link[href]')].map(el => el.getAttribute('href')).filter(href => href[0] === '/');
+            let staticSourceList = [
+               ...document.querySelectorAll('img[src]'),
+               ...document.querySelectorAll('link[href]'),
+               ...document.querySelectorAll('script[src]'),
+               ...document.querySelectorAll('video[src]'),
+               //...document.querySelectorAll('video[poster]'),
+               ...document.querySelectorAll('picture>source[srcset]'),
+            ].map(el => el.getAttribute('srcset') || el.getAttribute('href') || [el.getAttribute('src'), el.getAttribute('poster')]).flat(Infinity).filter(source => source && source[0] === '/');
+            //let scriptSrcList = [...document.querySelectorAll('script[src]')].map(el => el.getAttribute('src')).filter(src => src[0] === '/');
             let urlHrefList = [...document.querySelectorAll('a[href]')].map(el => el.getAttribute('href')).filter(href => href[0] === '/');
-            let imgSwiperList = []
+            let imgSwiperList = [...document.querySelectorAll('.swiper-container>.swiper-wrapper>*')].map(el => el.style.backgroundImage);
 
-            if(document.querySelector('.swiper-wrapper')){
-               const childList = [...document.querySelector('.swiper-wrapper').children];
+            //imgSwiperList = document.querySelectorAll('.swiper-container>.swiper-wrapper>*').map(el => el.style.backgroundImage);
 
-               imgSwiperList = childList.map(el => {
-                  const str = el.style.backgroundImage;
+            // if(document.querySelector('.swiper-container>.swiper-wrapper')){
+            //    const wrapperList = [...document.querySelectorAll('.swiper-wrapper')];
 
-                  return str.slice(5, str.length - 2);
-               });
-            }
+            //    wrapperList.forEach(wrap => {
+            //       const childList = [...wrap.children];
 
-            const staticHrefList = [...new Set([...linkHrefList, ...scriptSrcList, ...imgSrcList, ...imgSwiperList])];
+            //       imgSwiperList.push(...childList.map(el => el.style.backgroundImage));
+            //    });
+            // }
+
+            const staticHrefList = [...new Set([...staticSourceList])];
             urlHrefList = [...new Set(urlHrefList)]; 
 
-            return {staticHrefList, urlHrefList};
+            return {staticHrefList, urlHrefList, imgSwiperList};
          });
+
+         //console.log(imgSwiperList, 'list');
+         imgSwiperList.length && staticHrefList.push(
+            ...new Set(imgSwiperList.map(str => findUrlFormString(str).pop()))
+         );
 
          // console.log(staticHrefList);
          // console.log(urlHrefList);
 
          //console.log(staticHrefList);
 
-         for(const href of staticHrefList){
-            //console.log(href);
+         const getAndSet = async (source) => {
+            const statilList = await getDataAndWriteData(`${baseUrl}${source}`, path.resolve(staticDir, ...source.slice(1).split('/')));
+            staticSet.add(source);
 
-            if(!staticSet.has(href)){
-               await getDataAndWriteData(`${baseUrl}${href}`, path.resolve(staticDir, ...href.slice(1).split('/')));
-               staticSet.add(href);
-
-               //console.log('yes');
-            }
-            // else
-            //    console.log('no');
+            return statilList;
          }
+
+         //console.log(staticHrefList);
+
+         while(staticHrefList.length){
+            try{
+               const source = staticHrefList.pop();
+
+               if(!staticSet.has(source)){
+                  const statilList = await getDataAndWriteData(`${baseUrl}${source}`, path.resolve(staticDir, ...source.slice(1).split('/')));
+                  staticSet.add(source);
+
+                  staticHrefList.push(...statilList);
+               }
+            }catch(err){
+               console.log(err.message);
+            }
+         }
+
+         // for(const href of staticHrefList){
+         //    //console.log(href);
+
+         //    if(!staticSet.has(href)){
+         //       // const staticUrlList = await getDataAndWriteData(`${baseUrl}${href}`, path.resolve(staticDir, ...href.slice(1).split('/')));
+         //       // staticSet.add(href);
+         //       const staticUrlList = await getAndSet(href);
+
+         //       //console.log(staticUrlList);
+
+         //       for(const url of staticUrlList){
+         //          // await getDataAndWriteData(`${baseUrl}${url}`, path.resolve(staticDir, ...href.slice(1).split('/')));
+         //          // staticSet.add(href)
+
+         //          await getAndSet(url);
+         //       }
+         //       //console.log('yes');
+         //    }
+         //    // else
+         //    //    console.log('no');
+         // }
 
          urlQueue.push(...urlHrefList);
       }catch(err){
@@ -111,7 +161,7 @@ const urlQueue = ['/'];
       //console.log('end');
 
       //console.log('******');
-   }
+   //}
 
    await browser.close();
 })()

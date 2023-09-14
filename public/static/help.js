@@ -22,10 +22,11 @@ dropMenuStyleTop();
 
 // headerFixed()
 function headerOnMedia() {
+	let header = document.querySelector('.header');
 	if (window.innerWidth < 1025) {
-		let header = document.querySelector('.header');
 		header.classList.add('header-fixed');
 	} else {
+		header.classList.remove('header-fixed');
 		headerFixed();
 	}
 }
