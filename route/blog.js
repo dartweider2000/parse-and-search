@@ -1,12 +1,9 @@
 import { Router } from 'express';
-import { getPath } from '../helpres/html-file-path-healper.js';
-import path from 'path'
+import { getResponse } from '../helpres/http-get-response-helper.js';
+
 
 const blogRouter = Router();
 
-const getResponse = (req, res) => {
-   res.status(200).sendFile(getPath(req.url));
-}
 
 blogRouter.get('/blog', getResponse);
 

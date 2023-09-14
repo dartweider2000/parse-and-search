@@ -279,6 +279,8 @@ function paginationCheck() {
 	// let mainChildren = document.querySelectorAll("[data-lip]").childElementCount;
 	let pagination = document.querySelector('.pagination-page');
 	if (pagination) {
+		pagination.innerHTML = '';
+
 		for (let i = 0; i < main.length; i++) {
 			main[i].id = `b${i}`;
 			pagination.insertAdjacentHTML('beforeend', `<a class="doted" href=#b${i}></a>`);

@@ -8,4 +8,4 @@ const getPath = (url) => {
    return path.resolve('views', ...filePath);
 }
 
-export { getPath }
+export { getPath };
