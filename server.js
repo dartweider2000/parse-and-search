@@ -22,7 +22,7 @@ app.get('/help', getResponse);
 app.get('/about', getResponse);
 
 const getSearch = async (req, res) => {
-   console.log(req.query);
+   console.log(req.url);
 
    let oldHtml = (await promises.readFile(getPath(req.url))).toString();
    const regExp = /<script id="__NEXT_DATA__" type="application\/json">[\s\S]+?<\/script>/ig;

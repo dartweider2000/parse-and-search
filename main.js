@@ -36,7 +36,7 @@ const urlQueue = ['/'];
 
       try{
 
-         console.log(urlQueue);
+         //console.log(urlQueue);
 
          do{
             if(!urlQueue.length)
@@ -48,10 +48,19 @@ const urlQueue = ['/'];
          urlSet.add(url)
         
          await page.goto(`${baseUrl}${url}`);
-         const content = await page.content();
+         let content = await page.content();
 
          if(url.lastIndexOf('?') != -1){
             url = url.slice(0, url.lastIndexOf('?'));
+
+            const regExp = /<div id="__next" data-reactroot="">[\d\D]*<\/div>/ig;
+
+            let root = content.match(regExp)[0];
+
+            content = content.replace(regExp, root + '<div class="gcse-search"></div>');
+            content = content.replace(/<\/body>/ig, '<script async src="https://cse.google.com/cse.js?cx=c2d33ea0d202b48fc"></script></body>');
+
+            console.log(content);
          }
 
          let parthList = (url += '.html').split('/');
@@ -116,7 +125,7 @@ const urlQueue = ['/'];
             // let url = page.url().replace(baseUrl, '');
             // url = url.slice(0, url.lastIndexOf('?'));
 
-            console.log(hrefList);
+            //console.log(hrefList);
 
             urlQueue.push(...hrefList);
          }
