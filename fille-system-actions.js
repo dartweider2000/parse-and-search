@@ -2,6 +2,8 @@ import https from 'https';
 import fs from 'fs';
 import path from 'path';
 
+//функция получает данные с сервера
+
 const getData = async (url) => {
    return new Promise((resolve, reject) => {
       let data = Buffer.from('');
@@ -24,6 +26,8 @@ const getData = async (url) => {
    });
 }
 
+//функция записи данных в файл, если данный файл уже есть, то он не перезаписывается, если папки нет, то она создаётся.
+
 const writeData = async (filePath, data, search = false) => {
    try{
       await fs.promises.stat(filePath);
@@ -42,6 +46,8 @@ const writeData = async (filePath, data, search = false) => {
    }
 }
 
+//функция находит подключения статических файлов в фалаз .css, .js и.т.д
+
 const findUrlFormString = (data, type = 'css') => {
    const str = data.toString();
    let list = [];
@@ -55,6 +61,8 @@ const findUrlFormString = (data, type = 'css') => {
 
    return list;
 }
+
+//функция получает данные и записывает их
 
 const getDataAndWriteData = async (url, filePath) => {
    const data = await getData(url);

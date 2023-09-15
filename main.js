@@ -1,7 +1,6 @@
 import puppeteer from "puppeteer";
-import os from 'os'
 import path from "path";
-import fs, {promises} from "fs";
+import {promises} from "fs";
 import { findUrlFormString, getDataAndWriteData, writeData } from "./fille-system-actions.js";
 import { getPath } from "./helpres/html-file-path-healper.js";
 
@@ -12,21 +11,12 @@ const staticDir = 'public';
 
 const inputSelector = 'main form input#query';
 
-//const urlMap = {
-   // 'main': baseUrl,
-   // 'help': `${baseUrl}/help`,
-   // 'about': `${baseUrl}/about`,
-   // 'blog': `${baseUrl}/blog`,
-   // 'main-en': `${baseUrl}/en`,
-   // 'help-en': `${baseUrl}/en/help`,
-   // 'about-en': `${baseUrl}/en/about`,
-   // 'blog-en': `${baseUrl}/en/blog`,
-//}
-
 const urlSet = new Set();
 const staticSet = new Set();
 
-const urlQueue = ['/'];//['/en/search/?q=123'];
+const urlQueue = ['/'];
+
+//Функция парсер
 
 (async () => {
    const browser = await puppeteer.launch({'headless': 'new'});
@@ -34,11 +24,13 @@ const urlQueue = ['/'];//['/en/search/?q=123'];
 
    let url;
 
+   //цикл обхода html страниц
+
    up: while(urlQueue.length){
 
       try{
 
-         //console.log(urlQueue);
+         //проверяю на то исследовал ли я уже эту страницу
 
          do{
             if(!urlQueue.length)
@@ -49,15 +41,18 @@ const urlQueue = ['/'];//['/en/search/?q=123'];
          
          urlSet.add(url)
         
+         //перехожу на страницу
          await page.goto(`${baseUrl}${url}`);
          let content = await page.content();
 
-         let is = false;
+         let search = false;
+
+         //блок, в котором дополнительно обрабатываются запросы
 
          if(url.lastIndexOf('?') != -1){
             url = url.slice(0, url.lastIndexOf('?'));
 
-            is = true;
+            search = true;
 
             const regExp = /<div id="__next" data-reactroot="">[\d\D]*<\/div>/ig;
             let root = content.match(regExp)[0];
@@ -72,20 +67,23 @@ const urlQueue = ['/'];//['/en/search/?q=123'];
             content = content.replace(/{\s*"q"\s*:\s*"[\d\D]*?"\s*}/ig, JSON.stringify({q: ''}));
          }
 
+         //загрузка блока
+
          let parthList = (url += '.html').split('/');
          await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), content);
 
-         if(is){
-            let str = (await promises.readFile(getPath(url.slice(0, url.length - 5)))).toString();
+         //ещё одна проверка для запросов
+
+         if(search){
+            let html = (await promises.readFile(getPath(url.slice(0, url.length - 5)))).toString();
             const inputRegExp = /<input[\d\D]*?>/ig;
-            str = str.replace(inputRegExp, '<input name="query" id="query" class="search-form_input__f9sim" autocomplete="off" placeholder=" " value="">');
-         
-            //console.log(str);
+            html = html.replace(inputRegExp, '<input name="query" id="query" class="search-form_input__f9sim" autocomplete="off" placeholder=" " value="">');
 
             let parthList = url.split('/');
-            console.log(parthList);
-            await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), str, true);
+            await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), html, true);
          }
+
+         //поиск ссылок на статические ресурсы
 
          const {staticHrefList, urlHrefList, imgSwiperList} = await page.evaluate(() => {
             let staticSourceList = [
@@ -109,14 +107,7 @@ const urlQueue = ['/'];//['/en/search/?q=123'];
             ...new Set(imgSwiperList.map(str => findUrlFormString(str).pop()))
          );
 
-         //console.log(urlHrefList);
-
-         // const getAndSet = async (source) => {
-         //    const statilList = await getDataAndWriteData(`${baseUrl}${source}`, path.resolve(staticDir, ...source.slice(1).split('/')));
-         //    staticSet.add(source);
-
-         //    return statilList;
-         // }
+         //цикл загрузки статических ресурсов
 
          while(staticHrefList.length){  
             const source = staticHrefList.pop();
@@ -129,9 +120,13 @@ const urlQueue = ['/'];//['/en/search/?q=123'];
             }
          }
 
+         //добавляю в очереть ссылки на html документы
+
          urlQueue.push(...urlHrefList);
 
          const isHere = !!(await page.$(inputSelector));
+
+         //если это гравный экран с поиском, то ввожу данные и перехожу на страницу с поиском
 
          if(isHere){
             await page.type(inputSelector, '123');
@@ -142,12 +137,7 @@ const urlQueue = ['/'];//['/en/search/?q=123'];
             const hrefList = await page.evaluate(() => {
                return [...document.querySelectorAll('header nav ul li a[href].navigation_link__MPiS5')].map(el => el.getAttribute('href'));
             });
-           
-            // let url = page.url().replace(baseUrl, '');
-            // url = url.slice(0, url.lastIndexOf('?'));
-
-            //console.log(hrefList);
-
+         
             urlQueue.push(...hrefList);
          }
 

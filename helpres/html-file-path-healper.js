@@ -1,5 +1,7 @@
 import path from 'path';
 
+//функция конвертируе url запроса в путь до файла.
+
 const getPath = (url) => {
    if(url.lastIndexOf('?') != -1){
       url = url.slice(0, url.lastIndexOf('?'));

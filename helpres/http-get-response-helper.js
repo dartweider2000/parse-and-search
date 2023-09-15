@@ -1,9 +1,13 @@
 import { getPath } from "./html-file-path-healper.js";
 import {promises} from 'fs';
 
+//возвращает html для обычной html страницы
+
 const getResponse = (req, res) => {
    res.status(200).sendFile(getPath(req.url));
 }
+
+//возвращает html для сраниц поиска
 
 const getSearch = async (req, res) => {
    console.log(req.url);

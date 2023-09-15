@@ -1,5 +1,7 @@
-//console.log('!!!');
+
 document.addEventListener('DOMContentLoaded', async (e) => {
+   //функция, которая по умолчанию ждёт загрузки объекта google, но так же может ждать загрузку любого другого элемента
+
    const waitFor = async (ms = 0, target = null , type = 1) => {
       return new Promise((resolve, reject) => {
          let count = 0;
@@ -19,7 +21,9 @@ document.addEventListener('DOMContentLoaded', async (e) => {
       });
    }
 
-   const wait = async ms => new Promise(resolve => setTimeout(resolve, ms));
+   //const wait = async ms => new Promise(resolve => setTimeout(resolve, ms));
+
+   //жду загрузку
 
    const isSearch = location.pathname.includes('search');
    await Promise.all([waitFor(), waitFor(0, '.gsc-cursor-box', 2)]);
@@ -28,11 +32,9 @@ document.addEventListener('DOMContentLoaded', async (e) => {
       document.querySelectorAll('.gsc-tabsArea>div')[1].dispatchEvent(new Event('click'));
 
       await waitFor(0, '.gsc-resultsbox-visible>.gsc-resultsRoot:last-child .gsc-cursor-box', 2);
-
-
-      // document.querySelector()
-      // console.log(document.querySelector('.gsc-resultsbox-visible>.gsc-resultsRoot:last-child .gsc-cursor-box'));
    }
+
+   //получаю рабочий контейнер, в котором у меня есть и данные и пагинация
 
    const resultContainer = document.querySelectorAll('.gsc-resultsRoot')[isSearch ? 0 : 1];
 
@@ -47,7 +49,11 @@ document.addEventListener('DOMContentLoaded', async (e) => {
       contentBlock.classList.add('image-content');
    }
 
+   //удаляю дефолтный бкол, в котором находятся все данные
+
    document.querySelector('#___gcse_0').remove();
+
+   //создаю свой блок в котором юудут находится все данные
 
    const wrapper = document.createElement('div');
    wrapper.append(contentBlock, contentPagination);
@@ -56,6 +62,7 @@ document.addEventListener('DOMContentLoaded', async (e) => {
    const header = document.querySelector('header');
    wrapper.style.marginTop = `${header.offsetHeight}px`;
 
+   //обработчик событий для пагинации, чтобы было понятно на какой странице ейчас находимся
 
    contentPagination.addEventListener('click', e => {
       const el = e.target;
@@ -74,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async (e) => {
          });
       }
    })
-
 
    header.parentElement.after(wrapper);
 });
