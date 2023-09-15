@@ -1,7 +1,9 @@
 import puppeteer from "puppeteer";
 import os from 'os'
 import path from "path";
+import fs, {promises} from "fs";
 import { findUrlFormString, getDataAndWriteData, writeData } from "./fille-system-actions.js";
+import { getPath } from "./helpres/html-file-path-healper.js";
 
 
 const baseUrl = 'https://involtago.com';
@@ -24,7 +26,7 @@ const inputSelector = 'main form input#query';
 const urlSet = new Set();
 const staticSet = new Set();
 
-const urlQueue = ['/'];
+const urlQueue = ['/'];//['/en/search/?q=123'];
 
 (async () => {
    const browser = await puppeteer.launch({'headless': 'new'});
@@ -50,13 +52,14 @@ const urlQueue = ['/'];
          await page.goto(`${baseUrl}${url}`);
          let content = await page.content();
 
+         let is = false;
+
          if(url.lastIndexOf('?') != -1){
             url = url.slice(0, url.lastIndexOf('?'));
 
+            is = true;
+
             const regExp = /<div id="__next" data-reactroot="">[\d\D]*<\/div>/ig;
-
-            //<link rel="stylesheet" href="/my/google-custom-search.css"/>
-
             let root = content.match(regExp)[0];
 
             content = content.replace(regExp, root + '<div class="gcse-searchresults-only"></div>');
@@ -67,12 +70,22 @@ const urlQueue = ['/'];
             `);
             content = content.replace(/<\/head>/ig, '<link rel="stylesheet" href="/my/google-custom-search.css"/></head>');
             content = content.replace(/{\s*"q"\s*:\s*"[\d\D]*?"\s*}/ig, JSON.stringify({q: ''}));
-
-            console.log(content);
          }
 
          let parthList = (url += '.html').split('/');
          await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), content);
+
+         if(is){
+            let str = (await promises.readFile(getPath(url.slice(0, url.length - 5)))).toString();
+            const inputRegExp = /<input[\d\D]*?>/ig;
+            str = str.replace(inputRegExp, '<input name="query" id="query" class="search-form_input__f9sim" autocomplete="off" placeholder=" " value="">');
+         
+            //console.log(str);
+
+            let parthList = url.split('/');
+            console.log(parthList);
+            await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), str, true);
+         }
 
          const {staticHrefList, urlHrefList, imgSwiperList} = await page.evaluate(() => {
             let staticSourceList = [

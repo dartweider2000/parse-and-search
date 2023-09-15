@@ -24,7 +24,7 @@ const getData = async (url) => {
    });
 }
 
-const writeData = async (filePath, data) => {
+const writeData = async (filePath, data, search = false) => {
    try{
       await fs.promises.stat(filePath);
    }catch(err){
@@ -32,6 +32,13 @@ const writeData = async (filePath, data) => {
 
       await fs.promises.mkdir(dirPath, {'recursive': true});
       await fs.promises.writeFile(filePath, data);
+   }finally{
+      if(search){
+         const dirPath = filePath.slice(0, filePath.lastIndexOf(path.sep));
+
+         await fs.promises.mkdir(dirPath, {'recursive': true});
+         await fs.promises.writeFile(filePath, data);
+      }
    }
 }
 
