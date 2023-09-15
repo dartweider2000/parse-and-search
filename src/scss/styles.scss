@@ -1,4 +1,5 @@
 
+
 #__next{
    position: relative;
 }
@@ -16,10 +17,10 @@ main{
 }
 
 #___gcse_0{
-   // display: grid;
-   // height: 100vh;
-   //margin-top: 100px;
-   position: static !important;
+   // display: none;
+   //visibility: hidden;
+   opacity: 0 !important;
+   visibility: hidden !important;
 }
 
 .gsc-results-wrapper-overlay{
@@ -36,4 +37,60 @@ main{
 
 form.gsc-search-box{
    display: none !important;
+}
+
+
+//-------------------------------
+
+.my-wrapper{
+   position: relative !important;
+   z-index: -1 !important;
+}
+
+#__next{
+   position: relative !important;
+   z-index: 10000000000;
+}
+
+.gsc-expansionArea{
+   padding: 0 10px;
+}
+
+.gsc-result{
+   border: none !important;
+}
+
+a.gs-title{
+   color: var(--text) !important;
+
+   & *{
+      color: inherit !important;
+   }
+
+}
+
+.gsc-cursor{
+   display: flex;
+   justify-content: space-evenly;
+   padding: 10px 0;
+   border-top: 1px solid var(--text);
+
+   &>*{
+      //flex: 1 1 auto;
+      margin: 0 5px;
+      color: var(--text) !important;
+      cursor: pointer !important;
+      font-weight: 500 !important;
+   }
+
+   & .gsc-cursor-current-page{
+      color: red !important;
+   }
+}
+
+.image-content{
+   display: flex;
+   flex-wrap: wrap;
+   gap: 10px;
+   justify-content: space-evenly;
 }
