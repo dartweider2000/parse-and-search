@@ -26,24 +26,34 @@ const getData = async (url) => {
    });
 }
 
-//функция записи данных в файл, если данный файл уже есть, то он не перезаписывается, если папки нет, то она создаётся.
-
-const writeData = async (filePath, data, search = false) => {
+const isExist = async (filePath) => {
    try{
       await fs.promises.stat(filePath);
-   }catch(err){
-      const dirPath = filePath.slice(0, filePath.lastIndexOf(path.sep));
-
-      await fs.promises.mkdir(dirPath, {'recursive': true});
-      await fs.promises.writeFile(filePath, data);
-   }finally{
-      if(search){
-         const dirPath = filePath.slice(0, filePath.lastIndexOf(path.sep));
-
-         await fs.promises.mkdir(dirPath, {'recursive': true});
-         await fs.promises.writeFile(filePath, data);
-      }
+      return true;
+   }catch{
+      return false;
    }
+}
+
+//функция записи данных в файл, если данный файл уже есть, то он не перезаписывается, если папки нет, то она создаётся.
+
+const writeData = async (filePath, data) => {
+   if(await isExist(filePath))
+      return;
+
+   const dirPath = filePath.slice(0, filePath.lastIndexOf(path.sep));
+
+   await fs.promises.mkdir(dirPath, {'recursive': true});
+   await fs.promises.writeFile(filePath, data);
+
+   // try{
+   //    await fs.promises.stat(filePath);
+   // }catch(err){
+   //    const dirPath = filePath.slice(0, filePath.lastIndexOf(path.sep));
+
+   //    await fs.promises.mkdir(dirPath, {'recursive': true});
+   //    await fs.promises.writeFile(filePath, data);
+   // }
 }
 
 //функция находит подключения статических файлов в фалаз .css, .js и.т.д
@@ -80,4 +90,4 @@ const getDataAndWriteData = async (url, filePath) => {
    return staticList || [];
 }
 
-export { getDataAndWriteData, writeData, findUrlFormString, getData };
+export { getDataAndWriteData, writeData, findUrlFormString, getData, isExist };

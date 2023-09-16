@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer";
 import path from "path";
 import {promises} from "fs";
-import { findUrlFormString, getDataAndWriteData, writeData } from "./fille-system-actions.js";
-import { getPath } from "./helpres/html-file-path-healper.js";
+import { findUrlFormString, getDataAndWriteData, isExist, writeData } from "./fille-system-actions.js";
+import { getHtmlPath, getPathWidthoutQuery } from "./helpres/html-file-path-healper.js";
 
 
 const baseUrl = 'https://involtago.com';
@@ -14,7 +14,7 @@ const inputSelector = 'main form input#query';
 const urlSet = new Set();
 const staticSet = new Set();
 
-const urlQueue = ['/'];
+const urlQueue = ['/'];//['/search?q=123'];
 
 //Функция парсер
 
@@ -41,47 +41,42 @@ const urlQueue = ['/'];
          
          urlSet.add(url)
         
+         if(await isExist(getHtmlPath(url)))
+            continue;
+
          //перехожу на страницу
          await page.goto(`${baseUrl}${url}`);
          let content = await page.content();
 
-         let search = false;
+         //let search = false;
 
          //блок, в котором дополнительно обрабатываются запросы
 
          if(url.lastIndexOf('?') != -1){
-            url = url.slice(0, url.lastIndexOf('?'));
+            const inputRegExp = /<input[\d\D]*?>/ig;
+            const rootRegExp = /<div id="__next" data-reactroot="">[\d\D]*<\/div>/ig;
+            const queryRegExp = /{\s*"q"\s*:\s*"[\d\D]*?"\s*}/ig;
 
-            search = true;
+            let root = content.match(rootRegExp)[0];
 
-            const regExp = /<div id="__next" data-reactroot="">[\d\D]*<\/div>/ig;
-            let root = content.match(regExp)[0];
-
-            content = content.replace(regExp, root + '<div class="gcse-searchresults-only"></div>');
+            content = content.replace(rootRegExp, root + '<div class="gcse-searchresults-only"></div>');
             content = content.replace(/<\/body>/ig, `
                <script src="https://cse.google.com/cse.js?cx=c2d33ea0d202b48fc"></script>
                <script src="/my/google-custom-search.js"></script>
                </body>
             `);
             content = content.replace(/<\/head>/ig, '<link rel="stylesheet" href="/my/google-custom-search.css"/></head>');
-            content = content.replace(/{\s*"q"\s*:\s*"[\d\D]*?"\s*}/ig, JSON.stringify({q: ''}));
+            content = content.replace(queryRegExp, JSON.stringify({q: ''}));
+
+            content = content.replace(inputRegExp, '<input name="query" id="query" class="search-form_input__f9sim" autocomplete="off" placeholder=" " value="">');
          }
+
+
+
 
          //загрузка блока
 
-         let parthList = (url += '.html').split('/');
-         await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), content);
-
-         //ещё одна проверка для запросов
-
-         if(search){
-            let html = (await promises.readFile(getPath(url.slice(0, url.length - 5)))).toString();
-            const inputRegExp = /<input[\d\D]*?>/ig;
-            html = html.replace(inputRegExp, '<input name="query" id="query" class="search-form_input__f9sim" autocomplete="off" placeholder=" " value="">');
-
-            let parthList = url.split('/');
-            await writeData(path.resolve(htmlDir, ...(parthList.join('') === '.html' ? ['index.html'] : parthList)), html, true);
-         }
+         await writeData(getHtmlPath(url), content);
 
          //поиск ссылок на статические ресурсы
 
