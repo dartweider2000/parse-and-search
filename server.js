@@ -3,9 +3,7 @@ import path from 'path';
 import blogRouter from './route/blog.js';
 import { getResponse, getSearch } from './helpres/http-get-response-helper.js';
 import enRouter from './route/en.js';
-import fs, {promises} from 'fs';
-import { getData } from './fille-system-actions.js';
-import { getPath } from './helpres/html-file-path-healper.js';
+
 
 const app = express();
 const port = 3000;

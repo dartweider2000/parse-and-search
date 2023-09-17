@@ -41,8 +41,8 @@ const urlQueue = ['/'];//['/search?q=123'];
          
          urlSet.add(url)
         
-         if(await isExist(getHtmlPath(url)))
-            continue;
+         // if(await isExist(getHtmlPath(url)))
+         //    continue;
 
          //перехожу на страницу
          await page.goto(`${baseUrl}${url}`);
@@ -59,7 +59,7 @@ const urlQueue = ['/'];//['/search?q=123'];
 
             let root = content.match(rootRegExp)[0];
 
-            content = content.replace(rootRegExp, root + '<div class="gcse-searchresults-only"></div>');
+            content = content.replace(rootRegExp, root + '<div class="gcse-search"></div>');
             content = content.replace(/<\/body>/ig, `
                <script src="https://cse.google.com/cse.js?cx=c2d33ea0d202b48fc"></script>
                <script src="/my/google-custom-search.js"></script>
