@@ -26,7 +26,7 @@ const urlQueue = ['/'];//['/search?q=123'];
 
    //цикл обхода html страниц
 
-   up: while(urlQueue.length){
+   //up: while(urlQueue.length){
 
       try{
 
@@ -34,7 +34,7 @@ const urlQueue = ['/'];//['/search?q=123'];
 
          do{
             if(!urlQueue.length)
-               break up;
+               break;//break up;
 
             url = urlQueue.shift();
          }while(urlSet.has(url));
@@ -52,12 +52,15 @@ const urlQueue = ['/'];//['/search?q=123'];
 
          //блок, в котором дополнительно обрабатываются запросы
 
-         if(url.lastIndexOf('?') != -1){
-            const inputRegExp = /<input[\d\D]*?>/ig;
+         //if(url.lastIndexOf('?') != -1){
+            //const inputRegExp = /<input[\d\D]*?>/ig;
             const rootRegExp = /<div id="__next" data-reactroot="">[\d\D]*<\/div>/ig;
-            const queryRegExp = /{\s*"q"\s*:\s*"[\d\D]*?"\s*}/ig;
+            //const queryRegExp = /{\s*"q"\s*:\s*"[\d\D]*?"\s*}/ig;
+            //const queryRegExp = /"query"\s*:\s*{\s*[\d\D]*?\s*}/ig;
 
             let root = content.match(rootRegExp)[0];
+
+            //?#gsc.tab=${0}&gsc.q=${input.value}&gsc.page=5`);
 
             content = content.replace(rootRegExp, root + '<div class="gcse-search"></div>');
             content = content.replace(/<\/body>/ig, `
@@ -66,10 +69,19 @@ const urlQueue = ['/'];//['/search?q=123'];
                </body>
             `);
             content = content.replace(/<\/head>/ig, '<link rel="stylesheet" href="/my/google-custom-search.css"/></head>');
-            content = content.replace(queryRegExp, JSON.stringify({q: ''}));
+            // content = content.replace(queryRegExp, JSON.stringify({'#gsc.tab': '', 'gsc.q': '', 'gsc.page': ''}));
+            //content = content.replace(queryRegExp, `"query":${JSON.stringify({'#gsc.q': '', '#gsc.tab': '', 'gsc.page': ''})}`);
 
-            content = content.replace(inputRegExp, '<input name="query" id="query" class="search-form_input__f9sim" autocomplete="off" placeholder=" " value="">');
-         }
+            if(url.lastIndexOf('?') != -1){
+               // const queryRegExp = /"query"\s*:\s*{\s*[\d\D]*?\s*}/ig;
+               // content = content.replace(queryRegExp, `"query":${JSON.stringify({'#gsc.q': '', '#gsc.tab': '', 'gsc.page': ''})}`);
+
+               const queryRegExp = /"query"\s*:\s*{\s*[\d\D]*?\s*}/ig;
+               content = content.replace(queryRegExp, `"query":${JSON.stringify({'#gsc.q': ''})}`);
+            }
+
+            //content = content.replace(inputRegExp, '<input name="query" id="query" class="search-form_input__f9sim" autocomplete="off" placeholder=" " value="">');
+         //}
 
 
 
@@ -119,28 +131,28 @@ const urlQueue = ['/'];//['/search?q=123'];
 
          urlQueue.push(...urlHrefList);
 
-         const isHere = !!(await page.$(inputSelector));
+         //const isHere = !!(await page.$(inputSelector));
 
          //если это гравный экран с поиском, то ввожу данные и перехожу на страницу с поиском
 
-         if(isHere){
-            await page.type(inputSelector, '123');
-            await page.keyboard.press('Enter'); 
+         // if(isHere){
+         //    await page.type(inputSelector, '123');
+         //    await page.keyboard.press('Enter'); 
 
-            await page.waitForNavigation();
+         //    await page.waitForNavigation();
 
-            const hrefList = await page.evaluate(() => {
-               return [...document.querySelectorAll('header nav ul li a[href].navigation_link__MPiS5')].map(el => el.getAttribute('href'));
-            });
+         //    const hrefList = await page.evaluate(() => {
+         //       return [...document.querySelectorAll('header nav ul li a[href].navigation_link__MPiS5')].map(el => el.getAttribute('href'));
+         //    });
          
-            urlQueue.push(...hrefList);
-         }
+         //    urlQueue.push(...hrefList);
+         // }
 
       }catch(err){
          console.log(err.message);
       }
 
-   }
+   //}
 
    await browser.close();
 })()

@@ -85,6 +85,215 @@
 //    header.parentElement.after(wrapper);
 // });
 
+const isQueryPage = () => location.href.includes('/search') || location.href.includes('/images') || location.href.includes('/video');
+const getQyery = () => {
+   const qRegExp = /gsc\.q=[\d\D]*?(&|\s)/ig;
+   const tabRegExp = /gsc\.tab=[\d\D]*?(&|\s)/ig;
+   const pageRegExp = /gsc\.page=[\d\D]*?(&|\s)/ig;
+
+   const resQ = location.hash.match(qRegExp)?.[0];
+   const resTab = location.hash.match(tabRegExp)?.[0];
+   const resPage = location.hash.match(pageRegExp)?.[0];
+
+   return { 'q':  resQ ? resQ.slice(6) : '', 'tab': resTab ? resTab.slice(8) : 0, 'page': resPage ? resPage.slice(9) : 1  };
+} 
+
+const saveQyery = (qyery) => {
+   localStorage.setItem('query', JSON.stringify(qyery));
+}
+
+const loadQyery = () => {
+   return localStorage.getItem('qyery') && JSON.parse(localStorage.getItem('qyery')) || {'q': '', 'tab': 0, 'page': 1};
+}
+
+const changeInput = () => {
+   const inputSearch = document.querySelector('.gsc-input-box');
+   let inputSubmit;
+
+   if(!document.querySelector('.search-form_withoutButton__ZeHVz'))
+      inputSubmit = document.querySelector('.gsc-search-button-v2');
+
+   document.querySelector('.gsc-search-box').remove();
+
+   if(inputSubmit)
+      inputSubmit.innerHTML = document.querySelector('.search-form_button__Unuvh').textContent;
+
+   document.addEventListener('click', e => {
+      const el = e.target;
+
+      if(inputSearch.classList.contains('_focus') && !el.closest('.search-form_wrapper__ogg9T')){
+         inputSearch.classList.remove('_focus');
+      }else if(el.closest('.search-form_wrapper__ogg9T')){
+         inputSearch.classList.add('_focus');
+      }
+
+   });
+
+   document.querySelector('#query').replaceWith(inputSearch);
+
+   if(isQueryPage())
+      document.querySelector('.search-form_button__Unuvh').replaceWith(inputSubmit);
+}
+
+const forAll = () => {
+
+   const inputSearch = document.querySelector('.gsc-input-box');
+   let inputSubmit;
+
+   if(!document.querySelector('.search-form_withoutButton__ZeHVz'))
+      inputSubmit = document.querySelector('.gsc-search-button-v2');
+
+   document.querySelector('.gsc-search-box').remove();
+
+   if(inputSubmit)
+      inputSubmit.innerHTML = document.querySelector('.search-form_button__Unuvh').textContent;
+
+   document.addEventListener('click', e => {
+      const el = e.target;
+
+      if(inputSearch.classList.contains('_focus') && !el.closest('.search-form_wrapper__ogg9T')){
+         inputSearch.classList.remove('_focus');
+      }else if(el.closest('.search-form_wrapper__ogg9T')){
+         inputSearch.classList.add('_focus');
+      }
+
+   });
+
+   document.querySelector('#query').replaceWith(inputSearch);
+
+   if(isQueryPage())
+      document.querySelector('.search-form_button__Unuvh').replaceWith(inputSubmit);
+
+   //changeInput();
+
+   const input = document.querySelector('.gsc-input-box input');
+
+   const getInputValue = () => {
+      return input.value.trim();
+   }
+
+   const getInputValueOrQ = () => {
+      const inputValue = getInputValue(); 
+      const {q, tab, page} = getQyery();
+
+      console.log(inputValue);
+
+      if(!inputValue && !q)
+         return;
+
+      const res = inputValue ? inputValue : q;
+
+      return {'q': res, tab, page};
+   }
+
+   if(!isQueryPage()){
+      const handler = () => {
+         const {q, tab, page} = getInputValueOrQ();
+
+         if(!q)
+            return;
+
+         const url = `${location.origin}${location.pathname.includes('en') ? '/en' : ''}/search#gsc.q=${q}&gsc.tab=0&gsc.page=1`;
+         saveQyery({q, 'tab': 0, 'page': 1});
+
+         location.assign(url);
+      }
+
+      input.addEventListener('keydown', e => {
+         if(e.code !== 'Enter')
+            return;
+
+         handler();
+      });
+
+      if(inputSubmit){
+
+         inputSubmit.addEventListener('click', handler);
+      }
+
+      document.querySelector('suggestions_suggestions__DgAt8').addEventListener('click', e => {
+         const el = e.target;
+
+         if(!el.closest('.gssb_a '))
+            return;
+
+         handler();
+      });
+
+   }else{
+
+      const handler = () => {
+         const {q, tab, page} = getInputValueOrQ();
+
+         if(!q)
+            return;
+
+         console.log(tab);
+
+         let newTab = tab[tab.length - 1] == '&' ? [...tab].shift() : tab;  
+
+         saveQyery({q, 'tab': newTab, page});
+
+         const url = location.href.slice(0, location.href.lastIndexOf('#'))
+
+         //console.log(url);
+
+         console.log({q, newTab, page});
+
+         location.assign(`${url}#gsc.q=${q}&gsc.tab=${newTab}&gsc.page=${page}`);
+         location.reload();
+         //location.assign();
+      }
+
+      input.addEventListener('keydown', e => {
+         if(e.code !== 'Enter')
+            return;
+
+         handler();
+      });
+
+      document.querySelector('.suggestions_suggestions__DgAt8').addEventListener('click', e => {
+         const el = e.target;
+
+         if(!el.closest('.gssb_a '))
+            return;
+
+         handler();
+      });
+
+      inputSubmit.addEventListener('click', handler)
+
+      document.querySelectorAll('.navigation_link__MPiS5').forEach(link => link.addEventListener('click', e => {
+         e.preventDefault();
+
+         const isSearchLink = () => link.href.includes('/search');
+
+         const inputValue = getInputValue(); 
+         const {q, tab, page} = getQyery();
+
+         if(!inputValue && !q)
+            return;
+
+         const res = inputValue ? inputValue : q;
+         const resTab = isSearchLink() ? 0 : 1;
+
+         let origin = link.href.slice(0, link.href.lastIndexOf('?'));
+         origin[origin.length - 1] == '/' && (origin = origin.slice(0, origin.length - 1));
+
+         const url = `${origin}#gsc.q=${res}&gsc.tab=${resTab}&gsc.page=1`;
+
+         console.log(url);
+         //debugger;
+
+         saveQyery({'q': res, 'tab': resTab, 'page': 1});
+
+         location.assign(url);
+      }));
+
+
+   }
+}
+
 document.addEventListener('DOMContentLoaded', async e => {
    const waitFor = async (ms = 0, target = null , type = 1) => {
       return new Promise((resolve, reject) => {
@@ -105,52 +314,39 @@ document.addEventListener('DOMContentLoaded', async e => {
       });
    }
 
+   if(isQueryPage()){
+      
+      document.body.classList.add('_search');
+   }
+
    await waitFor();
 
-   //работа со строкой поиска
+   forAll();
 
-   const inputSearch = document.querySelector('.gsc-input-box');
-   const inputSubmit = document.querySelector('.gsc-search-button-v2');
+   const suggests = document.querySelector('.gssb_e');
 
-   document.querySelector('.gsc-search-box').remove();
+   document.querySelector('.suggestions_suggestions__DgAt8').append(suggests);
 
-   inputSubmit.innerHTML = document.querySelector('.search-form_button__Unuvh').textContent;
+   const clearButton = document.querySelector('.gsib_b');
 
-   //const input = inputSearch.querySelector('input');
+   clearButton.addEventListener('click', e => {
+      const {q, tab, page} = loadQyery();
 
-   document.addEventListener('click', e => {
-      const el = e.target;
+      const url = location.href;
 
-      if(inputSearch.classList.contains('_focus') && !el.closest('.gsc-input-box input')){
-         inputSearch.classList.remove('_focus');
-      }else if(el.closest('.gsc-input-box input')){
-         inputSearch.classList.add('_focus');
-      }
+      history.pushState(null, null, `${url.slice(0, url.lastIndexOf('#'))}#gsc.q=${q}&gsc.tab=${tab}&gsc.page=${page}`);
 
+      console.log(q, tab, page);
    });
 
-   console.dir(inputSearch.querySelector('input'));
-
-   document.querySelector('#query').replaceWith(inputSearch);
-   document.querySelector('.search-form_button__Unuvh').replaceWith(inputSubmit);
-
-   console.log(inputSearch, inputSubmit);
-
-   const header = document.querySelector('header');
    const ___gcse_0 = document.querySelector('#___gcse_0');
+   const header = document.querySelector('header');
+
    ___gcse_0.style.paddingTop = header.offsetHeight + 'px'; 
-
-   //-------------------------------------
-
-
-   //const content = document.querySelector('.gsc-tabdActive .gsc-expansionArea');
 
    await waitFor(0, '.gsc-tabdActive .gsc-results', 2);
 
-   //const pagination = document.querySelector('.gsc-tabdActive .gsc-cursor-box');
-
    const result = document.querySelector('.gsc-tabdActive .gsc-results');
-   //result.lastElementChild.remove();
    result.classList.add('.my-wrapper');
 
    header.parentElement.after(result);
@@ -159,82 +355,37 @@ document.addEventListener('DOMContentLoaded', async e => {
    ___gcse_0.remove();
 
    const form = header.querySelector('form');
+   const area = document.querySelector('.gsc-expansionArea');
 
-   const resizeHandler = e => {
-      if(window.innerWidth < 769){
-         result.style.paddingTop = header.offsetHeight + 'px'; 
+   let hieghtPaddingHandler = () => {
+      area.style.minHeight = window.innerHeight - header.offsetHeight + 'px';
+      result.style.paddingTop = header.offsetHeight + 'px'; 
+   }
 
-         if(result.classList.contains('_center')){
+   hieghtPaddingHandler();
+   window.addEventListener('resize', hieghtPaddingHandler);
+
+   if(location.pathname.includes('/search')){
+      const resizeHandler = e => {
+         if(window.innerWidth < 769){
+            if(result.classList.contains('_center')){
+               return;
+            }
+
+            result.style.width = "";
+            result.style.marginLeft = "";
+
+            result.classList.add('_center');
+
             return;
          }
 
-         result.style.width = "";
-         result.style.marginLeft = "";
-
-         result.classList.add('_center');
-
-         return;
+         result.classList.remove('_center');
+         result.style.width = form.offsetWidth + 'px';
+         result.style.marginLeft = form.offsetLeft + 'px';
       }
 
-      result.classList.remove('_center');
-      result.style.width = form.offsetWidth + 'px';
-      result.style.marginLeft = form.offsetLeft + 'px';
+      resizeHandler();
+      window.addEventListener('resize', resizeHandler);
    }
-
-   resizeHandler();
-   window.addEventListener('resize', resizeHandler);   
-
-   //удаляю гугловский блок
-   //document.querySelector('#___gcse_0').remove();
-
-   // const wrapper = document.createElement('div');
-   // wrapper.append(content, pagination);
-   // wrapper.classList.add('.my-wrapper');
-
-   // const header = document.querySelector('header');
-   // header.parentElement.after(wrapper);
-
-   // wrapper.style.paddingTop = header.offsetHeight + 'px'; 
-
-   //console.log(content, pagination);
-
-
-   const clearButton = document.querySelector('.gsib_b');
-
-   // const changleLocation = (is = false) => {
-   //    console.log(is);
-
-   //    location.assign(`${location.origin}${location.pathname}?#gsc.tab=${0}&gsc.q=${input.value}&gsc.page=5`);
-   // }
-
-
-   // document.querySelector('.search-form_form__07QVG ').addEventListener('submit', e => {
-   //    // if(e.code == 'Enter' && input.value.trim().length){
-   //       console.log('sub');
-
-
-   //       changleLocation();
-   //    //}
-
-   //    //e.stopPropagation();
-
-   //    //console.log('submit');
-   // })
-
-   //inputSubmit.addEventListener('click', e => input.value.trim().length && changleLocation());
-
-   // input.addEventListener('keydown', e => {
-   //    if(e.code == 'Enter' && input.value.trim().length){
-   //       console.log('!!!');
-
-
-   //       changleLocation(true);
-   //    }
-
-   //    e.stopPropagation();
-   // });
-
-   clearButton.addEventListener('click', e => {
-      block.classList.add('_visible');
-   });
 });
