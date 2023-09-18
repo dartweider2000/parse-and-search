@@ -103,7 +103,8 @@ const saveQyery = (qyery) => {
 }
 
 const loadQyery = () => {
-   return localStorage.getItem('qyery') && JSON.parse(localStorage.getItem('qyery')) || {'q': '', 'tab': 0, 'page': 1};
+   console.log(localStorage.getItem('query'));
+   return localStorage.getItem('query') ? JSON.parse(localStorage.getItem('query')) : {'q': '', 'tab': 0, 'page': 1};
 }
 
 const changeInput = () => {
@@ -323,6 +324,22 @@ document.addEventListener('DOMContentLoaded', async e => {
 
    forAll();
 
+   const {q: Q} = getQyery();
+   const {q, tab, page} = loadQyery();
+   //debugger;
+
+   //console.log(Q);
+
+   if(Q == '&' && q !== ''){
+      console.log(Q);
+      //debugger;
+      console.log(q, tab, page);
+      location.assign(`${location.href.slice(0, location.href.lastIndexOf('#'))}#gsc.q=${q}&gsc.tab=${tab}&gsc.page=${page}`);
+   }
+   // location.assign(`${location.href.slice(0, location.href.lastIndexOf('#'))}#gsc.q=${q}&gsc.tab=${tab}&gsc.page=${page}`);
+
+   //console.log('****');
+
    const suggests = document.querySelector('.gssb_e');
 
    document.querySelector('.suggestions_suggestions__DgAt8').append(suggests);
@@ -345,6 +362,9 @@ document.addEventListener('DOMContentLoaded', async e => {
    ___gcse_0.style.paddingTop = header.offsetHeight + 'px'; 
 
    await waitFor(0, '.gsc-tabdActive .gsc-results', 2);
+
+   // const {q, tab, page} = getQyery();
+   // location.assign(`${url}#gsc.q=${q}&gsc.tab=${tab}&gsc.page=${page}`);
 
    const result = document.querySelector('.gsc-tabdActive .gsc-results');
    result.classList.add('.my-wrapper');
