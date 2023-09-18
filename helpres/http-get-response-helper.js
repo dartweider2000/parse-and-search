@@ -12,13 +12,16 @@ const getResponse = (req, res) => {
 const getSearch = async (req, res) => {
    console.log(req.url);
 
-   let oldHtml = (await promises.readFile(getHtmlPath(req.url))).toString();
-   const regExp = /<script id="__NEXT_DATA__" type="application\/json">[\s\S]+?<\/script>/ig;
+   // (req as Request).c
+   //console.log(req);
 
-   const newProps = oldHtml.match(regExp)[0].replace(/{\s*"q"\s*:\s*"[\d\D]*?"\s*}/ig, JSON.stringify({q: req.query.q}));
-   oldHtml = oldHtml.replace(regExp, newProps);
+   // let oldHtml = (await promises.readFile(getHtmlPath(req.url))).toString();
+   // const regExp = /<script id="__NEXT_DATA__" type="application\/json">[\s\S]+?<\/script>/ig;
 
-   res.status(200).send(oldHtml);
+   // const newProps = oldHtml.match(regExp)[0].replace(/{\s*"q"\s*:\s*"[\d\D]*?"\s*}/ig, JSON.stringify({q: req.query.q}));
+   // oldHtml = oldHtml.replace(regExp, newProps);
+
+   res.status(200).sendFile(getHtmlPath(req.url));
 }
 
 export { getResponse, getSearch };

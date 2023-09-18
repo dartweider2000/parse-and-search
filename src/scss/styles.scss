@@ -44,6 +44,12 @@ body{
    min-height: 100% !important;
 }
 
+.search-form_wrapper__ogg9T{
+   .gsc-input-box{
+      border: 1px solid var(--gray-100) !important;
+   }
+}
+
 .gsc-input-box{
    border-radius: 40px !important;
    height: 100%;
@@ -54,7 +60,7 @@ body{
    z-index: 10;
    //border: 1.5px solid white;
    background-color: var(--search-background) !important;
-   border: 1px solid var(--gray-100) !important;
+   // border: 1px solid var(--gray-100) !important;
    color: var(--text) !important;
    padding: 0 35px 0 20px;
 
@@ -62,6 +68,7 @@ body{
       border: 1.5px solid #AADD22 !important;
       //border-right: none;
    }
+
 
    & tr{
       display: flex;
@@ -118,7 +125,7 @@ body{
    top: 50%;
    transform: translate(0, -50%);
    padding: 0 16px 0 48px !important;
-   z-index: -1;
+   z-index: 1;
    display: flex;
    justify-content: center;
    align-items: center;
@@ -211,6 +218,10 @@ body{
    &._center{
       padding-left: 10px !important;
       padding-right: 10px !important;
+
+      .gsc-cursor{
+         justify-content: center !important;
+      }
    }
 }
 
@@ -386,4 +397,60 @@ body{
    border: none !important;
    border-radius: 5px !important;
    box-shadow: 0 0 3px 0 var(--text) !important;
+}
+
+
+.form__wrap{
+   //flex: 1 1 100% !important
+   height: 43px;
+}
+
+.input__wrap{
+   margin-right: 80px !important;
+   z-index: 40 !important;
+   //flex: 1 1 100% !important;
+   border: none !important;
+
+   .gsc-input-box{
+      width: 100% !important;
+      padding-right: 5px !important;
+   }
+}
+
+.input__wrap.gsc-input-box {
+   border: 1px solid var(--gray-200) !important;
+}
+
+.list-hints{
+   //position: relative !important;
+   max-height: none !important;
+   border: none !important;
+   border-radius: 5px !important;
+   visibility: visible !important;
+   box-shadow: 0 0 10px 0 var(--text) !important;
+   //padding-left: 20px !important; 
+   //padding: 10px !important;
+
+   .gssb_e{
+      //padding: 10px !important;
+      // padding-left: 25px !important;
+   }
+
+   // .gssb_a {
+   //    border: none !important;
+   // }
+}
+
+.blog_intro__cWtez:after{
+   display: none;
+}
+
+.gs-spelling{
+   display: none !important;
+}
+
+.gsc-results.gsc-webResult{
+   &>.gsc-webResult.gsc-result{
+      display: none !important;
+   }
 }
