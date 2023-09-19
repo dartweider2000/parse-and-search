@@ -384,6 +384,9 @@ body{
 .gssb_a {
    color: var(--text) !important;
    background-color: var(--background) !important;
+   padding-top: 5px !important;
+   padding-bottom: 5px !important;
+   padding-left: 30px !important;
 }
 
 .gsq_a{
@@ -397,6 +400,10 @@ body{
    border: none !important;
    border-radius: 5px !important;
    box-shadow: 0 0 3px 0 var(--text) !important;
+}
+
+.gssb_a, .gssb_a td{
+   white-space: wrap !important;
 }
 
 
@@ -427,9 +434,10 @@ body{
    border: none !important;
    border-radius: 5px !important;
    visibility: visible !important;
-   box-shadow: 0 0 10px 0 var(--text) !important;
+   box-shadow: 0 0 5px 0 var(--text) !important;
    //padding-left: 20px !important; 
    //padding: 10px !important;
+   overflow: visible !important;
 
    .gssb_e{
       //padding: 10px !important;

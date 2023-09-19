@@ -4,13 +4,11 @@ const isQueryPage = () => location.href.includes('/search') || location.href.inc
 const getQyery = () => {
    const qRegExp = /gsc\.q=[\d\D]*?(&|\s)*?/ig;
    const tabRegExp = /gsc\.tab=[\d\D]+?(&|\s)*?/ig;
-   const pageRegExp = /gsc\.page=[\d\D]+?(&|\s)*?/ig;
+   const pageRegExp = /gsc\.page=[\d\D]*(&|\s)*?/ig;
 
    const resQ = location.hash.match(qRegExp)?.[0];
    const resTab = location.hash.match(tabRegExp)?.[0];
    const resPage = location.hash.match(pageRegExp)?.[0];
-
-   //console.log(location);
 
    localStorage.setItem('url', location.href);
 
@@ -22,223 +20,8 @@ const saveQyery = (qyery) => {
 }
 
 const loadQyery = () => {
-   console.log(localStorage.getItem('query'));
+   //console.log(localStorage.getItem('query'));
    return localStorage.getItem('query') ? JSON.parse(localStorage.getItem('query')) : {'q': '', 'tab': 0, 'page': 1};
-}
-
-const changeInput = () => {
-   const inputSearch = document.querySelector('.gsc-input-box');
-   let inputSubmit;
-
-   if(!document.querySelector('.search-form_withoutButton__ZeHVz'))
-      inputSubmit = document.querySelector('.gsc-search-button-v2');
-
-   document.querySelector('.gsc-search-box').remove();
-
-   if(inputSubmit)
-      inputSubmit.innerHTML = document.querySelector('.search-form_button__Unuvh').textContent;
-
-   document.addEventListener('click', e => {
-      const el = e.target;
-
-      if(inputSearch.classList.contains('_focus') && !el.closest('.search-form_wrapper__ogg9T')){
-         inputSearch.classList.remove('_focus');
-      }else if(el.closest('.search-form_wrapper__ogg9T')){
-         inputSearch.classList.add('_focus');
-      }
-
-   });
-
-   document.querySelector('#query').replaceWith(inputSearch);
-
-   if(isQueryPage())
-      document.querySelector('.search-form_button__Unuvh').replaceWith(inputSubmit);
-}
-
-const forAll = () => {
-
-   const inputSearch = document.querySelector('.gsc-input-box');
-   let inputSubmit;
-
-   if(!document.querySelector('.search-form_withoutButton__ZeHVz'))
-      inputSubmit = document.querySelector('.gsc-search-button-v2');
-
-   document.querySelector('.gsc-search-box').remove();
-
-   if(inputSubmit)
-      inputSubmit.innerHTML = document.querySelector('header form [type="submit"]').textContent;
-
-   let wrapperSelector;
-
-   if(document.querySelector('.search-form_wrapper__ogg9T')){
-      wrapperSelector = '.search-form_wrapper__ogg9T';
-   }else if(document.querySelector('.input__wrap')){
-      wrapperSelector = '.input__wrap';
-   }
-
-   document.addEventListener('click', e => {
-      const el = e.target;
-
-      if(inputSearch.classList.contains('_focus') && !el.closest(wrapperSelector)){
-         inputSearch.classList.remove('_focus');
-      }else if(el.closest(wrapperSelector)){
-         inputSearch.classList.add('_focus');
-      }
-
-   });
-
-   if(document.querySelector('#query')){
-      document.querySelector('#query')?.replaceWith(inputSearch)
-   }else if(document.querySelector('#search')){
-      document.querySelector('#search')?.replaceWith(inputSearch);
-   }
-
-
-   if(document.querySelector('header form [type="submit"]'))
-      document.querySelector('header form [type="submit"]').replaceWith(inputSubmit);
-
-   const input = document.querySelector('.gsc-input-box input');
-
-   const getInputValue = () => {
-      return input.value.trim();
-   }
-
-   const getInputValueOrQ = () => {
-      const inputValue = getInputValue(); 
-      const {q, tab, page} = getQyery();
-
-      console.log(inputValue);
-
-      if(!inputValue && !q)
-         return;
-
-      const res = inputValue ? inputValue : q;
-
-      return {'q': res, tab, page};
-   }
-
-
-   if(!isQueryPage()){
-      const handler = () => {
-         try{
-            const {q, tab, page} = getInputValueOrQ();
-
-            if(!q)
-               return;
-
-            const url = `${location.origin}${location.pathname.includes('en') ? '/en' : ''}/search#gsc.q=${q}&gsc.tab=0&gsc.page=1`;
-            saveQyery({q, 'tab': 0, 'page': 1});
-
-            console.log(url);
-
-            location.assign(url);
-         }catch{
-         }
-      }
-
-      input.addEventListener('keydown', e => {
-         if(e.code !== 'Enter')
-            return;
-
-         handler();
-      });
-
-      if(inputSubmit){
-
-         inputSubmit.addEventListener('click', handler);
-      }
-
-      let suggests;
-
-      if(document.querySelector('.suggestions_suggestions__DgAt8')){
-         suggests = document.querySelector('.suggestions_suggestions__DgAt8');
-      }else if(document.querySelector('.list-hints')){
-         suggests = document.querySelector('.list-hints');
-      }
-      
-      suggests.addEventListener('click', e => {
-         const el = e.target;
-
-         if(!el.closest('.gsq_a'))
-            return;
-
-         handler();
-      });
-
-   }else{
-
-      const handler = () => {
-         try{
-            const {q, tab, page} = getInputValueOrQ();
-
-            if(!q)
-               return;
-
-            let newTab = tab[tab.length - 1] == '&' ? [...tab].shift() : tab;  
-
-            saveQyery({q, 'tab': newTab, page});
-
-            const url = location.href.slice(0, location.href.lastIndexOf('#'))
-
-            location.assign(`${url}#gsc.q=${q}&gsc.tab=${newTab}&gsc.page=${page}`);
-            location.reload();
-         }catch{
-
-         }
-      }
-
-      input.addEventListener('keydown', e => {
-         if(e.code !== 'Enter')
-            return;
-
-         handler();
-      });
-
-      document.querySelector('.suggestions_suggestions__DgAt8').addEventListener('click', e => {
-         const el = e.target;
-
-         if(!el.closest('.gsq_a'))
-            return;
-
-         handler();
-      });
-
-      inputSubmit.addEventListener('click', handler);
-
-      const isQueryLink = url => ['/search?', '/images?', '/video?'].some(href => url.includes(href));
-
-      [...document.querySelectorAll('a')].filter(link => isQueryLink(link.href)).forEach(link => {
-         console.log(link);
-
-         link.addEventListener('click', e => {
-            e.preventDefault();
-
-            
-
-            const isSearchLink = () => link.href.includes('/search');
-
-            const inputValue = getInputValue(); 
-            const {q, tab, page} = getQyery();
-
-            if(!inputValue && !q)
-               return;
-
-            const res = inputValue ? inputValue : q;
-            const resTab = isSearchLink() ? 0 : 1;
-
-            let origin = link.href.slice(0, link.href.lastIndexOf('?'));
-            origin[origin.length - 1] == '/' && (origin = origin.slice(0, origin.length - 1));
-
-            const url = `${origin}#gsc.q=${res}&gsc.tab=${resTab}&gsc.page=1`;
-
-            saveQyery({'q': res, 'tab': resTab, 'page': 1});
-
-            location.assign(url);
-         })
-      });
-
-
-   }
 }
 
 document.addEventListener('DOMContentLoaded', async e => {
@@ -268,142 +51,382 @@ document.addEventListener('DOMContentLoaded', async e => {
 
    await waitFor();
 
-   forAll();
+   let inputSubmit;
 
-   const {q, tab, page} = loadQyery();
+   const setSearchPlace = () => {  
+      const inputSearch = document.querySelector('.gsc-input-box');
+      //let inputSubmit;
 
-   if(isQueryPage()){
+      if(!document.querySelector('.search-form_withoutButton__ZeHVz'))
+         inputSubmit = document.querySelector('.gsc-search-button-v2');
 
-      let {q: Q, page: Page} = getQyery();
+      document.querySelector('.gsc-search-box').remove();
 
-      console.log(Q, Page);
+      if(inputSubmit)
+         inputSubmit.innerHTML = document.querySelector('header form [type="submit"]').textContent;
 
-      if(Q[Q.length - 1] == '&'){
-         Q = Q.slice(0, Q.length - 1);
+      let wrapperSelector;
+
+      if(document.querySelector('.search-form_wrapper__ogg9T')){
+         wrapperSelector = '.search-form_wrapper__ogg9T';
+      }else if(document.querySelector('.input__wrap')){
+         wrapperSelector = '.input__wrap';
       }
 
-      const url = location.href;
+      document.addEventListener('click', e => {
+         const el = e.target;
 
-      location.assign(`${url.slice(0, url.lastIndexOf('#'))}#gsc.q=${Q || q || ''}&gsc.tab=${url.includes('/search') ? 0 : 1}&gsc.page=${Page || page || '1'}`);
-   }else if(q !== ''){
-      saveQyery({'q': '', 'tab': 0, 'page': 1});
+         if(inputSearch.classList.contains('_focus') && !el.closest('.gsc-input-box .gsib_a')){
+            inputSearch.classList.remove('_focus');
+         }else if(el.closest('.gsc-input-box .gsib_a')){
+            inputSearch.classList.add('_focus');
+         }
+
+      });
+
+      if(document.querySelector('#query')){
+         document.querySelector('#query')?.replaceWith(inputSearch)
+      }else if(document.querySelector('#search')){
+         document.querySelector('#search')?.replaceWith(inputSearch);
+      }
+
+
+      if(document.querySelector('header form [type="submit"]'))
+         document.querySelector('header form [type="submit"]').replaceWith(inputSubmit);
    }
 
-   const suggests = document.querySelector('.gssb_e');
+   setSearchPlace();
 
-   if(document.querySelector('.suggestions_suggestions__DgAt8'))
-      document.querySelector('.suggestions_suggestions__DgAt8')?.append(suggests) 
-   else if(document.querySelector('.list-hints')){
-      document.querySelector('.list-hints').append(suggests);
+   const input = document.querySelector('.gsc-input-box input');
+
+   const setSearchListeners = () => {
+
+      const getInputValue = () => {
+         return input.value.trim();
+      }
+
+      const getInputValueOrQ = () => {
+         const inputValue = getInputValue(); 
+         const {q, tab, page} = getQyery();
+
+         //console.log(inputValue);
+
+         if(!inputValue && !q)
+            return;
+
+         const res = inputValue ? inputValue : q;
+
+         return {'q': res, tab, page};
+      }
+
+
+      if(!isQueryPage()){
+         const handler = () => {
+            try{
+               const {q, tab, page} = getInputValueOrQ();
+
+               if(!q)
+                  return;
+
+               const url = `${location.origin}${location.pathname.includes('en') ? '/en' : ''}/search#gsc.q=${q}&gsc.tab=0&gsc.page=1`;
+               saveQyery({q, 'tab': 0, 'page': 1});
+
+               //console.log(url);
+
+               location.assign(url);
+            }catch{
+            }
+         }
+
+         input.addEventListener('keydown', e => {
+            if(e.code !== 'Enter')
+               return;
+
+            handler();
+         });
+
+         if(inputSubmit){
+            inputSubmit.addEventListener('click', handler);
+         }
+
+         let suggests;
+
+         if(document.querySelector('.suggestions_suggestions__DgAt8')){
+            suggests = document.querySelector('.suggestions_suggestions__DgAt8');
+         }else if(document.querySelector('.list-hints')){
+            suggests = document.querySelector('.list-hints');
+         }
+         
+         suggests.addEventListener('click', e => {
+            const el = e.target;
+
+            if(!el.closest('.gsq_a'))
+               return;
+
+            handler();
+         });
+
+      }else{
+
+         const handler = () => {
+            try{
+               const {q, tab, page} = getInputValueOrQ();
+
+               if(!q)
+                  return;
+
+               let newTab = tab[tab.length - 1] == '&' ? [...tab].shift() : tab;  
+
+               saveQyery({q, 'tab': newTab, page});
+
+               const url = location.href.slice(0, location.href.lastIndexOf('#'))
+
+               location.assign(`${url}#gsc.q=${q}&gsc.tab=${newTab}&gsc.page=${page}`);
+               location.reload();
+            }catch{
+
+            }
+         }
+
+         input.addEventListener('keydown', e => {
+            if(e.code !== 'Enter')
+               return;
+
+            handler();
+         });
+
+         document.querySelector('.suggestions_suggestions__DgAt8').addEventListener('click', e => {
+            const el = e.target;
+
+            if(!el.closest('.gsq_a'))
+               return;
+
+            handler();
+         });
+
+         inputSubmit.addEventListener('click', handler);
+
+         const isQueryLink = url => ['/search?', '/images?', '/video?'].some(href => url.includes(href));
+
+         [...document.querySelectorAll('a')].filter(link => isQueryLink(link.href)).forEach(link => {
+            //console.log(link);
+
+            link.addEventListener('click', e => {
+               e.preventDefault();
+
+               
+
+               const isSearchLink = () => link.href.includes('/search');
+
+               const inputValue = getInputValue(); 
+               const {q, tab, page} = getQyery();
+
+               if(!inputValue && !q)
+                  return;
+
+               const res = inputValue ? inputValue : q;
+               const resTab = isSearchLink() ? 0 : 1;
+
+               let origin = link.href.slice(0, link.href.lastIndexOf('?'));
+               origin[origin.length - 1] == '/' && (origin = origin.slice(0, origin.length - 1));
+
+               const url = `${origin}#gsc.q=${res}&gsc.tab=${resTab}&gsc.page=1`;
+
+               saveQyery({'q': res, 'tab': resTab, 'page': 1});
+
+               location.assign(url);
+            })
+         });
+
+      }
    }
 
-   if(isQueryPage()){
+   setSearchListeners();
 
-      const clearButton = document.querySelector('.gsib_b');
+   const addClearButtonListener = () => {
+      if(isQueryPage()){
+         const clearButton = document.querySelector('.gsib_b');
 
-      clearButton.addEventListener('click', e => {
-         const {q, tab, page} = loadQyery();
+         clearButton.addEventListener('click', e => {
+            const {q, tab, page} = loadQyery();
+            let {q: Q, page: Page} = getQyery();
+
+            const url = location.href;
+
+            if(Q[Q.length - 1] == '&'){
+               Q = Q.slice(0, Q.length - 1);
+            }
+
+            //console.log('sdsd');
+
+            history.pushState(null, null, `${url.slice(0, url.lastIndexOf('#'))}#gsc.q=${Q || q || ''}&gsc.tab=${tab}&gsc.page=${page || Page || '1'}`);
+
+           //console.log('sdsd');
+         });
+      }
+   }
+
+   addClearButtonListener();
+
+   const loadWithParams = () => {
+
+      let {q, page} = loadQyery();
+
+      if(isQueryPage()){
+
          let {q: Q, page: Page} = getQyery();
 
-         const url = location.href;
-
+   
          if(Q[Q.length - 1] == '&'){
             Q = Q.slice(0, Q.length - 1);
          }
 
-         history.pushState(null, null, `${url.slice(0, url.lastIndexOf('#'))}#gsc.q=${Q || q || ''}&gsc.tab=${tab}&gsc.page=${page || Page || '1'}`);
-
-         console.log(Q, Page);
-      });
-
+         if(Page > 10)
+            Page = 10;
+   
+         const url = location.href;
+   
+         location.assign(`${url.slice(0, url.lastIndexOf('#'))}#gsc.q=${Q || q || ''}&gsc.tab=${url.includes('/search') ? 0 : 1}&gsc.page=${Page || page || '1'}`);
+      }else if(q !== ''){
+         saveQyery({'q': '', 'tab': 0, 'page': 1});
+         history.pushState(null, null, `${location.href.slice(0, location.href.lastIndexOf('#'))}#gsc.q=`);
+         input.value = '';
+      }
    }
 
-   const ___gcse_0 = document.querySelector('#___gcse_0');
+   loadWithParams();
 
+   const relocateSuggests = () => {
+      const suggests = document.querySelector('.gssb_e');
+
+      //console.log(suggests);
+
+      if(document.querySelector('.suggestions_suggestions__DgAt8'))
+         document.querySelector('.suggestions_suggestions__DgAt8')?.append(suggests) 
+      else if(document.querySelector('.list-hints')){
+         document.querySelector('.list-hints').append(suggests);
+      }
+   }
+
+   relocateSuggests();
+
+   // const addClearButtonListener = () => {
+   //    if(isQueryPage()){
+   //       const clearButton = document.querySelector('.gsib_b');
+
+   //       clearButton.addEventListener('click', e => {
+   //          const {q, tab, page} = loadQyery();
+   //          let {q: Q, page: Page} = getQyery();
+
+   //          const url = location.href;
+
+   //          if(Q[Q.length - 1] == '&'){
+   //             Q = Q.slice(0, Q.length - 1);
+   //          }
+
+   //          history.pushState(null, null, `${url.slice(0, url.lastIndexOf('#'))}#gsc.q=${Q || q || ''}&gsc.tab=${tab}&gsc.page=${page || Page || '1'}`);
+
+   //         console.log('sdsd');
+   //       });
+   //    }
+   // }
+
+   // addClearButtonListener();
+
+   const ___gcse_0 = document.querySelector('#___gcse_0');
 
    if(!isQueryPage()){
       ___gcse_0.style.display = 'none';
       return;
    }
 
-   const header = document.querySelector('header');
+   const makeSerpScene = async () => {
 
-   ___gcse_0.style.paddingTop = header.offsetHeight + 'px'; 
+      const header = document.querySelector('header');
 
-   await waitFor(0, '.gsc-tabdActive .gsc-results', 2);
+      ___gcse_0.style.paddingTop = header.offsetHeight + 'px'; 
 
+      await waitFor(0, '.gsc-tabdActive .gsc-results', 2);
 
-   const result = document.querySelector('.gsc-tabdActive .gsc-results');
-   result.classList.add('.my-wrapper');
+      const result = document.querySelector('.gsc-tabdActive .gsc-results');
+      result.classList.add('.my-wrapper');
 
-   header.parentElement.after(result);
+      header.parentElement.after(result);
 
-   result.style.paddingTop = header.offsetHeight + 'px'; 
-   ___gcse_0.style.display = 'none';
+      result.style.paddingTop = header.offsetHeight + 'px'; 
+      ___gcse_0.style.display = 'none';
 
-   const form = header.querySelector('form');
-   const area = document.querySelector('.gsc-expansionArea');
+      const form = header.querySelector('form');
+      const area = document.querySelector('.gsc-expansionArea');
 
-   let hieghtPaddingHandler = () => {
-      area.style.minHeight = window.innerHeight - header.offsetHeight + 'px';
-      result.style.paddingTop = header.offsetHeight + 'px';
-   }
+      let hieghtPaddingHandler = () => {
+         area.style.minHeight = window.innerHeight - header.offsetHeight + 'px';
+         result.style.paddingTop = header.offsetHeight + 'px';
+      }
 
-   hieghtPaddingHandler();
-   window.addEventListener('resize', hieghtPaddingHandler);
+      hieghtPaddingHandler();
+      window.addEventListener('resize', hieghtPaddingHandler);
 
-   if(location.pathname.includes('/search')){
-      const resizeHandler = e => {
-         if(window.innerWidth < 769){
-            if(result.classList.contains('_center')){
+      if(location.pathname.includes('/search')){
+         const resizeHandler = e => {
+            if(window.innerWidth < 769){
+               if(result.classList.contains('_center')){
+                  return;
+               }
+
+               result.style.width = "";
+               result.style.marginLeft = "";
+
+               result.classList.add('_center');
+
                return;
             }
 
-            result.style.width = "";
-            result.style.marginLeft = "";
-
-            result.classList.add('_center');
-
-            return;
+            result.classList.remove('_center');
+            result.style.width = form.offsetWidth + 'px';
+            result.style.marginLeft = form.offsetLeft + 'px';
          }
 
-         result.classList.remove('_center');
-         result.style.width = form.offsetWidth + 'px';
-         result.style.marginLeft = form.offsetLeft + 'px';
+         resizeHandler();
+         window.addEventListener('resize', resizeHandler);
       }
 
-      resizeHandler();
-      window.addEventListener('resize', resizeHandler);
    }
 
-   document.addEventListener('click', e => {
-      const el = e.target;
+   await makeSerpScene();
 
-      if(el.closest('.gsc-cursor-page')){
-         let {q: Q, tab, page: Page} = getQyery();
-         let {q, page} = loadQyery();
+   const addPagginationListener = () => {
+      document.addEventListener('click', e => {
+         const el = e.target;
 
-         let res;
+         if(el.closest('.gsc-cursor-page') || el.closest('.gsc-cursor-container-previous') || el.closest('.gsc-cursor-numbered-page') ||el.closest('.gsc-cursor-container-next')){
+            let {q: Q, tab, page: Page} = getQyery();
+            let {q, page} = loadQyery();
 
-         if(Q.length > 1 && Q.endsWith('&')){
-            res = Q.slice(0, g.length - 1);
-         }else if(Q.length > 1){
-            res = Q;
-         }else{
-            res = q;
+            let res;
+
+            if(Q.length > 1 && Q.endsWith('&')){
+               res = Q.slice(0, g.length - 1);
+            }else if(Q.length > 1){
+               res = Q;
+            }else{
+               res = q;
+            }
+
+            saveQyery({'q': res, tab, 'page': Page || page || 1});
+
+            setTimeout(() => {
+               window.scrollTo({
+                  'left': 0,
+                  'top': 0,
+                  'behavior': 'smooth'
+               });
+            }, 0);
          }
+      });
+   }
 
-         saveQyery({'q': res, tab, 'page': Page || page || 1});
-
-         setTimeout(() => {
-            window.scrollTo({
-               'left': 0,
-               'top': 0,
-               'behavior': 'smooth'
-            });
-         }, 0);
-      }
-   });
+   addPagginationListener();
 
    if(document.querySelector('#rc-anchor-container')){
       ___gcse_0.style.display = 'block';
