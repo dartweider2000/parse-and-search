@@ -2,10 +2,9 @@
   "name": "parser",
   "version": "1.0.0",
   "description": "",
-  "main": "pack.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
-    "parse": "node main.js",
     "serve": "nodemon server.js",
     "dev": "webpack --mode=production",
     "prod": "node server.js"
