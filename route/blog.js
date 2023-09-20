@@ -9,9 +9,11 @@ blogRouter.get('/blog', getResponse);
 
 blogRouter.get('/blog/elimination-of-forest-fires', getResponse);
 
-blogRouter.get('/blog/first-art-skate-park', (req, res) => {
-   res.status(301).redirect('/blog');
-});
+blogRouter.get('/blog/first-art-skate-park', getResponse);
+
+// blogRouter.get('/blog/first-art-skate-park', (req, res) => {
+//    res.status(301).redirect('/blog');
+// });
 
 blogRouter.get('/blog/course-completed', getResponse);
 
