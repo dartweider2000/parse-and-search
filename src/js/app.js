@@ -535,6 +535,8 @@ document.addEventListener('DOMContentLoaded', async e => {
       document.addEventListener('click', e => {
          const el = e.target;
 
+         console.log('!!!');
+
          if(!document.querySelector('.gs-mobilePreview'))
             return;
 
@@ -578,6 +580,8 @@ document.addEventListener('DOMContentLoaded', async e => {
          }
       });
    }
+
+   //console.log('!!!');
 
    setImageMabilePreview();
 });
