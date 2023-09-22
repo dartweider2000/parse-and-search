@@ -25,6 +25,17 @@ const loadQyery = () => {
 
 document.addEventListener('DOMContentLoaded', async e => {
 
+   if(document.querySelector('.help_swiper__NBWsm')){
+      const swiper = new Swiper('.help_swiper__NBWsm', {
+         'slidesPerView': 1,
+         'navigation': {
+            'nextEl': '.swiper-button-next',
+            'prevEl': '.swiper-button-prev'
+         },
+         'autoHeight': true
+      });
+   }
+
   document.querySelectorAll('.navigation_list__4Sxuz a').forEach(link => link.href.includes('/video?q=') && link.parentElement.remove());
 
    if(document.querySelector('.header__wrapper--right')){
@@ -32,12 +43,7 @@ document.addEventListener('DOMContentLoaded', async e => {
       const nav = document.querySelector('.drop__menu');
       const html = document.querySelector('html');
       const header = document.querySelector('header');
-      //nav.style.top = header.offsetHeight + 'px';
-
-      // const half__screen = document.querySelector('.half__screen');
-
-      // const div = document.createElement('div');
-      // div.insertAdjacentHTML('afterbegin', half__screen.innerHTML);
+   
       const makeMenuHeight = () => {
          nav.style.top = header.offsetHeight + 'px';
 
@@ -48,10 +54,7 @@ document.addEventListener('DOMContentLoaded', async e => {
 
       }
 
-
-      //(window.innerWidth < 768)
-         makeMenuHeight();
-
+      makeMenuHeight();
 
       button.addEventListener('click', e => {
          if(!nav.classList.contains('drop__menu-active') && html.style.overflow !== '' && window.innerWidth < 768){
@@ -68,16 +71,13 @@ document.addEventListener('DOMContentLoaded', async e => {
             nav.style.height = 'auto';
          }else if(nav.classList.contains('drop__menu-active')){
             html.style.overflow = 'hidden';
-            //nav.style.top = header.offsetHeight + 'px';
             makeMenuHeight();
          }
       });
    }
 
-
    if(document.querySelector('.main-header_header__6f50p')){
       const header = document.querySelector('.main-header_header__6f50p');
-
 
       const scrollHandler = e => {
          if(scrollY > 0){
@@ -107,20 +107,23 @@ document.addEventListener('DOMContentLoaded', async e => {
 
    const waitFor = async (ms = 0, target = null , type = 1) => {
       return new Promise((resolve, reject) => {
-         let count = 0;
+         //let count = 0;
    
          const interval = setInterval(() => {
-
-            if(type == 1 && google || type == 2 && document.querySelector(target)){
-               clearInterval(interval);
-               resolve();
+            try{
+               if(type == 1 && google || type == 2 && document.querySelector(target)){
+                  clearInterval(interval);
+                  resolve();
+               }
+      
+               // if(ms >= 20_000){
+               //    reject();
+               // }
+            }catch{
+               
             }
    
-            if(ms >= 20_000){
-               reject();
-            }
-   
-            count += ms;
+            //count += ms;
          }, ms);
       });
    };
@@ -132,6 +135,18 @@ document.addEventListener('DOMContentLoaded', async e => {
    }
 
    await waitFor();
+
+  // console.log('-----');
+
+   const checkCapcha = () => {
+      if(document.querySelector('#recaptcha-wrapper')){
+         ___gcse_0.style.display = 'block';
+      }
+   }
+
+   const ___gcse_0 = document.querySelector('#___gcse_0');
+
+   //checkCapcha();
 
    let inputSubmit;
 
@@ -173,8 +188,12 @@ document.addEventListener('DOMContentLoaded', async e => {
       }
 
 
-      if(document.querySelector('header form [type="submit"]'))
-         document.querySelector('header form [type="submit"]').replaceWith(inputSubmit);
+      if(document.querySelector('header form [type="submit"]')){
+         const submit = document.querySelector('header form [type="submit"]');
+         submit.style.display = 'none';
+
+         submit.replaceWith(inputSubmit);
+      }
    }
 
    setSearchPlace();
@@ -373,7 +392,7 @@ document.addEventListener('DOMContentLoaded', async e => {
    
          const url = location.href;
 
-         location.assign(`${url.slice(0, url.lastIndexOf('#'))}#gsc.q=${Q || q || ''}&gsc.tab=${url.includes('/search') ? 0 : 1}&gsc.page=${Page || page || '1'}`);
+         location.assign(`${url.slice(0, url.lastIndexOf('#'))}#gsc.q=${Q || q || ''}&gsc.tab=${url.includes('/search') ? 0 : 1}&gsc.page=${(Page || page || '1')}`);
       }else{
          saveQyery({'q': '', 'tab': 0, 'page': 1});
          const newUrl = `${location.href.slice(0, location.href.lastIndexOf('#'))}`;
@@ -398,31 +417,6 @@ document.addEventListener('DOMContentLoaded', async e => {
    }
 
    relocateSuggests();
-
-   // const addClearButtonListener = () => {
-   //    if(isQueryPage()){
-   //       const clearButton = document.querySelector('.gsib_b');
-
-   //       clearButton.addEventListener('click', e => {
-   //          const {q, tab, page} = loadQyery();
-   //          let {q: Q, page: Page} = getQyery();
-
-   //          const url = location.href;
-
-   //          if(Q[Q.length - 1] == '&'){
-   //             Q = Q.slice(0, Q.length - 1);
-   //          }
-
-   //          history.pushState(null, null, `${url.slice(0, url.lastIndexOf('#'))}#gsc.q=${Q || q || ''}&gsc.tab=${tab}&gsc.page=${page || Page || '1'}`);
-
-   //         console.log('sdsd');
-   //       });
-   //    }
-   // }
-
-   // addClearButtonListener();
-
-   const ___gcse_0 = document.querySelector('#___gcse_0');
 
    if(!isQueryPage()){
       ___gcse_0.style.display = 'none';
@@ -452,12 +446,13 @@ document.addEventListener('DOMContentLoaded', async e => {
          area.style.minHeight = window.innerHeight - header.offsetHeight + 'px';
          result.style.paddingTop = header.offsetHeight + 'px';
       }
+      let resizeHandler;
 
       hieghtPaddingHandler();
       window.addEventListener('resize', hieghtPaddingHandler);
 
       if(location.pathname.includes('/search')){
-         const resizeHandler = e => {
+         resizeHandler = e => {
             if(window.innerWidth < 769){
                if(result.classList.contains('_center')){
                   return;
@@ -482,6 +477,13 @@ document.addEventListener('DOMContentLoaded', async e => {
 
       const observer = new MutationObserver((mutationList, observer) => {
          document.querySelectorAll('.gsc-expansionArea a').forEach(link => link.setAttribute('target', '_blank'));
+
+         hieghtPaddingHandler();
+         if(location.pathname.includes('/search')){
+            resizeHandler();
+         }
+
+        // checkCapcha();
       });
 
       observer.observe(area, {
@@ -498,7 +500,7 @@ document.addEventListener('DOMContentLoaded', async e => {
       document.addEventListener('click', async e => {
          const el = e.target;
 
-         if(el.closest('.gsc-cursor-page') || el.closest('.gsc-cursor-container-previous') || el.closest('.gsc-cursor-numbered-page') ||el.closest('.gsc-cursor-container-next')){
+         if(el.closest('.gsc-cursor-page') || el.closest('.gsc-cursor-container-previous') || el.closest('.gsc-cursor-numbered-page') || el.closest('.gsc-cursor-container-next') || el.closest('.gsc-cursor-next-page')){
             let {q: Q, tab, page: Page} = getQyery();
             let {q, page} = loadQyery();
 
@@ -527,9 +529,7 @@ document.addEventListener('DOMContentLoaded', async e => {
 
    addPagginationListener();
 
-   if(document.querySelector('#rc-anchor-container')){
-      ___gcse_0.style.display = 'block';
-   }
+   //checkCapcha();
 
    const setImageMabilePreview = () => {
       document.addEventListener('click', e => {
