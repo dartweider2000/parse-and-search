@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async e => {
             try{
                if(type == 1 && google || type == 2 && document.querySelector(target)){
                   clearInterval(interval);
-                  resolve();
+                  resolve(target);
                }
       
                // if(ms >= 20_000){
@@ -269,6 +269,7 @@ document.addEventListener('DOMContentLoaded', async e => {
          const handler = () => {
             try{
                const {q, tab, page} = getInputValueOrQ();
+               console.log('-------------');
 
                if(!q)
                   return;
@@ -426,72 +427,105 @@ document.addEventListener('DOMContentLoaded', async e => {
 
       ___gcse_0.style.paddingTop = header.offsetHeight + 'px'; 
 
-      await waitFor(0, '.gsc-tabdActive .gsc-results', 2);
+      const res = await Promise.race([waitFor(0, '.gs-no-results-result', 2), waitFor(0, '.gsc-tabdActive .gsc-results', 2), waitFor(0, '#recaptcha-wrapper', 2)]);
 
-      const result = document.querySelector('.gsc-tabdActive .gsc-results');
-      result.classList.add('.my-wrapper');
-
-      header.parentElement.after(result);
-
-      result.style.paddingTop = header.offsetHeight + 'px'; 
-      ___gcse_0.style.display = 'none';
-
-      const form = header.querySelector('form');
-      const area = document.querySelector('.gsc-expansionArea');
-
-      let hieghtPaddingHandler = () => {
-         area.style.minHeight = window.innerHeight - header.offsetHeight + 'px';
-         result.style.paddingTop = header.offsetHeight + 'px';
+      if(res == '#recaptcha-wrapper'){
+         return false;
       }
-      let resizeHandler;
 
-      hieghtPaddingHandler();
-      window.addEventListener('resize', hieghtPaddingHandler);
+      //if(res == '.gsc-tabdActive .gsc-results'){
 
-      if(location.pathname.includes('/search')){
-         resizeHandler = e => {
-            if(window.innerWidth < 769){
-               if(result.classList.contains('_center')){
+         const result = document.querySelector('.gsc-tabdActive .gsc-results');
+         result.classList.add('.my-wrapper');
+
+         header.parentElement.after(result);
+
+         result.style.paddingTop = header.offsetHeight + 'px'; 
+         ___gcse_0.style.display = 'none';
+
+         const form = header.querySelector('form');
+         const area = document.querySelector('.gsc-expansionArea');
+
+         let hieghtPaddingHandler = () => {
+            area.style.minHeight = window.innerHeight - header.offsetHeight + 'px';
+            result.style.paddingTop = header.offsetHeight + 'px';
+         }
+         let resizeHandler;
+
+         hieghtPaddingHandler();
+         window.addEventListener('resize', hieghtPaddingHandler);
+
+         if(location.pathname.includes('/search')){
+            resizeHandler = e => {
+               if(window.innerWidth < 769){
+                  if(result.classList.contains('_center')){
+                     return;
+                  }
+
+                  result.style.width = "";
+                  result.style.marginLeft = "";
+
+                  result.classList.add('_center');
+
                   return;
                }
 
-               result.style.width = "";
-               result.style.marginLeft = "";
-
-               result.classList.add('_center');
-
-               return;
+               result.classList.remove('_center');
+               result.style.width = form.offsetWidth + 'px';
+               result.style.marginLeft = form.offsetLeft + 'px';
             }
 
-            result.classList.remove('_center');
-            result.style.width = form.offsetWidth + 'px';
-            result.style.marginLeft = form.offsetLeft + 'px';
+            resizeHandler();
+            window.addEventListener('resize', resizeHandler);
          }
 
-         resizeHandler();
-         window.addEventListener('resize', resizeHandler);
+         const observer = new MutationObserver((mutationList, observer) => {
+            document.querySelectorAll('.gsc-expansionArea a').forEach(link => link.setAttribute('target', '_blank'));
+
+            hieghtPaddingHandler();
+            if(location.pathname.includes('/search')){
+               resizeHandler();
+            }
+
+         // checkCapcha();
+         });
+
+         observer.observe(area, {
+            'childList': true,
+            'subtree': true,
+         });
+         
+         //return true;
+      //}
+
+      if(res == '.gs-no-results-result'){
+         const area = document.querySelector('.gsc-expansionArea');
+
+         area.style.cssText = `
+            min-height: ${area.style.minHeight};
+            display: block !important;
+         `;
+
+         return false;
       }
 
-      const observer = new MutationObserver((mutationList, observer) => {
-         document.querySelectorAll('.gsc-expansionArea a').forEach(link => link.setAttribute('target', '_blank'));
+      if(!document.querySelector('.gsc-cursor')){
+         const area = document.querySelector('.gsc-expansionArea');
+         area.style.paddingBottom = '20px';
+         return false;
+      }
 
-         hieghtPaddingHandler();
-         if(location.pathname.includes('/search')){
-            resizeHandler();
-         }
-
-        // checkCapcha();
-      });
-
-      observer.observe(area, {
-         'childList': true,
-         'subtree': true,
-      });
+      return true;
    }
 
-   checkCapcha();
+   //checkCapcha()
 
-   await makeSerpScene();
+   const bool = await makeSerpScene();
+
+   if(!bool)
+      return;
+
+   checkCapcha();
 
    document.querySelectorAll('.gsc-expansionArea a').forEach(link => link.setAttribute('target', '_blank'));
 
