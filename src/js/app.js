@@ -136,17 +136,14 @@ document.addEventListener('DOMContentLoaded', async e => {
 
    await waitFor();
 
-  // console.log('-----');
+
+   const ___gcse_0 = document.querySelector('#___gcse_0');
 
    const checkCapcha = () => {
       if(document.querySelector('#recaptcha-wrapper')){
          ___gcse_0.style.display = 'block';
       }
    }
-
-   const ___gcse_0 = document.querySelector('#___gcse_0');
-
-   //checkCapcha();
 
    let inputSubmit;
 
@@ -492,50 +489,18 @@ document.addEventListener('DOMContentLoaded', async e => {
       });
    }
 
+   checkCapcha();
+
    await makeSerpScene();
 
    document.querySelectorAll('.gsc-expansionArea a').forEach(link => link.setAttribute('target', '_blank'));
 
-   const addPagginationListener = () => {
-      document.addEventListener('click', async e => {
-         const el = e.target;
-
-         if(el.closest('.gsc-cursor-page') || el.closest('.gsc-cursor-container-previous') || el.closest('.gsc-cursor-numbered-page') || el.closest('.gsc-cursor-container-next') || el.closest('.gsc-cursor-next-page')){
-            let {q: Q, tab, page: Page} = getQyery();
-            let {q, page} = loadQyery();
-
-            let res;
-
-            if(Q.length > 1 && Q.endsWith('&')){
-               res = Q.slice(0, g.length - 1);
-            }else if(Q.length > 1){
-               res = Q;
-            }else{
-               res = q;
-            }
-
-            saveQyery({'q': res, tab, 'page': Page || page || 1});
-
-            setTimeout(() => {
-               window.scrollTo({
-                  'left': 0,
-                  'top': 0,
-                  'behavior': 'smooth'
-               });
-            }, 0);
-         }
-      });
-   }
-
-   addPagginationListener();
-
-   //checkCapcha();
+   if(!isQueryPage())
+      return;
 
    const setImageMabilePreview = () => {
       document.addEventListener('click', e => {
          const el = e.target;
-
-         console.log('!!!');
 
          if(!document.querySelector('.gs-mobilePreview'))
             return;
@@ -581,87 +546,97 @@ document.addEventListener('DOMContentLoaded', async e => {
       });
    }
 
-   //console.log('!!!');
-
    setImageMabilePreview();
 
    const area = document.querySelector('.gsc-expansionArea');
-   console.log(area.offsetHeight);
+   const header = document.querySelector('header');
+      
+   const clearPadding = () => {
+      area.style.paddingBottom = '0px';
+      area.classList.remove('_padding');
+   }
+
+   const execute = (resSelector, activeSelector) => {
+      setTimeout(() => {
+         const isDesk = resSelector === '.gs-selectedImageResult';
+         if(document.querySelector(resSelector) && isDesk || document.querySelector(activeSelector) && !isDesk){
+            let result, active;
+            if(isDesk){
+               result = document.querySelector(resSelector);
+               active = result.querySelector(activeSelector);
+            }else{
+               active = document.querySelector(activeSelector);
+               result = active.closest(resSelector);
+            }
+
+            const activePreviewHeight = active.offsetHeight;
+            const resultTop = result.offsetTop;
+            const areaHeight = area.offsetHeight;
+            const headerHeight = header.offsetHeight;
+            const resultHeight = result.offsetHeight;
+
+            const alreadyPadding = area.classList.contains('_padding') ? parseInt(area.style.paddingBottom) : 0;
+
+            const heihgtWidthOutActive = headerHeight + areaHeight - alreadyPadding;
+            const heightWidthActive = resultTop +  (isDesk ? resultHeight : headerHeight) + activePreviewHeight;
+
+            const paddingBottom = heightWidthActive - heihgtWidthOutActive;
+
+            if(paddingBottom > 0){
+               area.style.paddingBottom = paddingBottom + 'px';
+
+               area.classList.add('_padding');
+            }else{
+               clearPadding();
+            }
+         }else{
+            clearPadding();
+         }
+      }, 20);
+   }
 
    const setAreaPaddingBottom = (e) => {
       if(document.querySelector('.gs-mobilePreview')){
-         setTimeout(() => {
-            if(document.querySelector('.gs-mobilePreview._active__')){
-               const active = document.querySelector('.gs-mobilePreview._active__');
-               const result = active.closest('.gsc-imageResult');
-               const header = document.querySelector('header');
-
-               const activeMobilePreviewHeight = active.offsetHeight;
-               const resultTop = result.offsetTop;
-               const areaHeight = area.offsetHeight;
-               const headerHeight = header.offsetHeight;
-
-               const alreadyPadding = area.classList.contains('_padding') ? parseInt(area.style.paddingBottom) : 0;
-
-               const heihgtWidthOutActive = headerHeight + areaHeight - alreadyPadding;
-               const heightWidthActive = resultTop + headerHeight + activeMobilePreviewHeight;
-
-               const paddingBottom = heightWidthActive - heihgtWidthOutActive;
-
-               if(paddingBottom > 0){
-                  area.style.paddingBottom = paddingBottom + 'px';
-
-                  area.classList.add('_padding');
-               }else{
-                  area.style.paddingBottom = 0 + 'px';
-
-                  area.classList.remove('_padding');
-               }
-            }else{
-               area.style.paddingBottom = 0 + 'px';
-
-                area.classList.remove('_padding');
-            }
-         }, 0);
+         execute('.gsc-imageResult', '.gs-mobilePreview._active__');
       }else{
-         setTimeout(() => {
-            if(document.querySelector('.gs-selectedImageResult')){
-               const result = document.querySelector('.gs-selectedImageResult');
-               const active = result.querySelector('.gs-imagePreviewArea');
-               const header = document.querySelector('header');
-
-               const activeMobilePreviewHeight = active.offsetHeight;
-               const resultTop = result.offsetTop;
-               const resultHeight = result.offsetHeight;
-               const areaHeight = area.offsetHeight;
-               const headerHeight = header.offsetHeight;
-
-               const alreadyPadding = area.classList.contains('_padding') ? parseInt(area.style.paddingBottom) : 0;
-
-               const heihgtWidthOutActive = headerHeight + areaHeight - alreadyPadding;
-               const heightWidthActive = resultTop + resultHeight + activeMobilePreviewHeight;
-
-               const paddingBottom = heightWidthActive - heihgtWidthOutActive;
-
-               if(paddingBottom > 0){
-                  area.style.paddingBottom = paddingBottom + 'px';
-
-                  area.classList.add('_padding');
-               }else{
-                  area.style.paddingBottom = 0 + 'px';
-
-                  area.classList.remove('_padding');
-               }
-            }else{
-               area.style.paddingBottom = 0 + 'px';
-
-                  area.classList.remove('_padding');
-            }
-
-         }, 0);
+         execute('.gs-selectedImageResult', '.gs-imagePreviewArea');
       }
    }
 
    area.addEventListener('click', setAreaPaddingBottom);
-   window.addEventListener('resize', setAreaPaddingBottom);
+   window.addEventListener('resize', setAreaPaddingBottom);;
+
+   const addPagginationListener = () => {
+      document.addEventListener('click', async e => {
+         const el = e.target;
+
+         if(el.closest('.gsc-cursor-page') || el.closest('.gsc-cursor-container-previous') || el.closest('.gsc-cursor-numbered-page') || el.closest('.gsc-cursor-container-next') || el.closest('.gsc-cursor-next-page')){
+            let {q: Q, tab, page: Page} = getQyery();
+            let {q, page} = loadQyery();
+
+            let res;
+
+            if(Q.length > 1 && Q.endsWith('&')){
+               res = Q.slice(0, g.length - 1);
+            }else if(Q.length > 1){
+               res = Q;
+            }else{
+               res = q;
+            }
+
+            saveQyery({'q': res, tab, 'page': Page || page || 1});
+
+            setTimeout(() => {
+               window.scrollTo({
+                  'left': 0,
+                  'top': 0,
+                  'behavior': 'smooth'
+               });
+               clearPadding();
+            }, 0);
+         }
+      });
+   }
+
+   addPagginationListener();
 });

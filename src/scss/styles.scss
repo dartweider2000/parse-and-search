@@ -601,9 +601,11 @@ header{
    }
 }
 
-.gsc-cursor-next-page{
+.gsc-cursor-next-page, .gsc-cursor-final-page{
    color: var(--link) !important;
 }
+
+
 
 // body{
 //    overflow: hidden !important;
