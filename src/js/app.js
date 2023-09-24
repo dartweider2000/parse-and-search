@@ -610,7 +610,9 @@ document.addEventListener('DOMContentLoaded', async e => {
       document.addEventListener('click', async e => {
          const el = e.target;
 
-         if(el.closest('.gsc-cursor-page') || el.closest('.gsc-cursor-container-previous') || el.closest('.gsc-cursor-numbered-page') || el.closest('.gsc-cursor-container-next') || el.closest('.gsc-cursor-next-page')){
+         if(el.closest('.gsc-cursor-page') || el.closest('.gsc-cursor-container-previous') || 
+         el.closest('.gsc-cursor-numbered-page') || el.closest('.gsc-cursor-container-next') || 
+         el.closest('.gsc-cursor-next-page') || el.closest('.gsc-cursor-final-page')){
             let {q: Q, tab, page: Page} = getQyery();
             let {q, page} = loadQyery();
 
@@ -632,7 +634,9 @@ document.addEventListener('DOMContentLoaded', async e => {
                   'top': 0,
                   'behavior': 'smooth'
                });
-               clearPadding();
+
+               if(!el.closest('.gsc-cursor-final-page') && !el.closest('.gsc-cursor-numbered-page') && !el.closest('.gsc-cursor-current-page'))
+                  clearPadding();
             }, 0);
          }
       });
