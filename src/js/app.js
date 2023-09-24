@@ -584,4 +584,84 @@ document.addEventListener('DOMContentLoaded', async e => {
    //console.log('!!!');
 
    setImageMabilePreview();
+
+   const area = document.querySelector('.gsc-expansionArea');
+   console.log(area.offsetHeight);
+
+   const setAreaPaddingBottom = (e) => {
+      if(document.querySelector('.gs-mobilePreview')){
+         setTimeout(() => {
+            if(document.querySelector('.gs-mobilePreview._active__')){
+               const active = document.querySelector('.gs-mobilePreview._active__');
+               const result = active.closest('.gsc-imageResult');
+               const header = document.querySelector('header');
+
+               const activeMobilePreviewHeight = active.offsetHeight;
+               const resultTop = result.offsetTop;
+               const areaHeight = area.offsetHeight;
+               const headerHeight = header.offsetHeight;
+
+               const alreadyPadding = area.classList.contains('_padding') ? parseInt(area.style.paddingBottom) : 0;
+
+               const heihgtWidthOutActive = headerHeight + areaHeight - alreadyPadding;
+               const heightWidthActive = resultTop + headerHeight + activeMobilePreviewHeight;
+
+               const paddingBottom = heightWidthActive - heihgtWidthOutActive;
+
+               if(paddingBottom > 0){
+                  area.style.paddingBottom = paddingBottom + 'px';
+
+                  area.classList.add('_padding');
+               }else{
+                  area.style.paddingBottom = 0 + 'px';
+
+                  area.classList.remove('_padding');
+               }
+            }else{
+               area.style.paddingBottom = 0 + 'px';
+
+                area.classList.remove('_padding');
+            }
+         }, 0);
+      }else{
+         setTimeout(() => {
+            if(document.querySelector('.gs-selectedImageResult')){
+               const result = document.querySelector('.gs-selectedImageResult');
+               const active = result.querySelector('.gs-imagePreviewArea');
+               const header = document.querySelector('header');
+
+               const activeMobilePreviewHeight = active.offsetHeight;
+               const resultTop = result.offsetTop;
+               const resultHeight = result.offsetHeight;
+               const areaHeight = area.offsetHeight;
+               const headerHeight = header.offsetHeight;
+
+               const alreadyPadding = area.classList.contains('_padding') ? parseInt(area.style.paddingBottom) : 0;
+
+               const heihgtWidthOutActive = headerHeight + areaHeight - alreadyPadding;
+               const heightWidthActive = resultTop + resultHeight + activeMobilePreviewHeight;
+
+               const paddingBottom = heightWidthActive - heihgtWidthOutActive;
+
+               if(paddingBottom > 0){
+                  area.style.paddingBottom = paddingBottom + 'px';
+
+                  area.classList.add('_padding');
+               }else{
+                  area.style.paddingBottom = 0 + 'px';
+
+                  area.classList.remove('_padding');
+               }
+            }else{
+               area.style.paddingBottom = 0 + 'px';
+
+                  area.classList.remove('_padding');
+            }
+
+         }, 0);
+      }
+   }
+
+   area.addEventListener('click', setAreaPaddingBottom);
+   window.addEventListener('resize', setAreaPaddingBottom);
 });
