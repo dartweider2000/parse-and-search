@@ -41,7 +41,9 @@ const look = (dirPath) => {
    dirList.forEach(dirName => look(path.resolve(dirPath, dirName)));
 }
 
-look(path.resolve('views'));
+look(path.resolve('public', 'views'));
+
+//console.log(filePathList);
 
 filePathList.forEach(filePath => {
    const mainRegExp = /<script src="\/_next\/static\/chunks\/main-17e44cbdb5d5a0ca\.js" defer=""><\/script>/ig;
@@ -52,14 +54,28 @@ filePathList.forEach(filePath => {
    const footer_2RegExp = /<div class="footer_block__tnIrs"><h2 class="footer_title__q0weN">Mobile app<\/h2><a class="footer_app__HwCOE" target="_blank" href="https:\/\/apps\.apple.com\/ru\/app\/involtago\/id1531286310" rel="noreferrer"><img src="\/images\/app-market-icons\/en-app-store-icon\.png" alt="App Store"><\/a><a class="footer_app__HwCOE" target="_blank" href="https:\/\/play.google\.com\/store\/apps\/details\?id=com\.involta\.involtago&amp;hl=ru&amp;gl=US" rel="noreferrer"><img src="\/images\/app-market-icons\/en-google-play-icon.png" alt="Google Play"><\/a><a class="footer_app__HwCOE" target="_blank" href="https:\/\/appgallery\.huawei\.com\/#\/app\/C104055821\?sharePrepath=ag&amp;locale=ru_RU&amp;source=appshare&amp;subsource=C104055821" rel="noreferrer"><img src="\/images\/app-market-icons\/en-app-gallery-icon\.png" alt="App Gallery"><\/a><\/div>/ig;
    const footer_3RegExp = /<div class="footer__col footer__col-mobile">[\d\D]*?<h2 class="footer__title">Mobile App<\/h2>[\d\D]*?<a href="https:\/\/apps.apple.com\/ru\/app\/involtago\/id1531286310" class="icon__link">[\d\D]*?<img src="\/static\/Appstore-en.svg" alt="AppStore" class="app__logo">[\d\D]*?<\/a>[\d\D]*?<a href="https:\/\/play.google.com\/store\/apps\/details\?id=com\.involta\.involtago&amp;hl=ru&amp;gl=US" class="icon__link">[\d\D]*?<img src="\/static\/googlePlay-en\.svg" alt="googlePlay" class="app__logo"><\/a>[\d\D]*?<a href="https:\/\/appgallery\.huawei\.com\/#\/app\/C104055821\?sharePrepath=ag&amp;locale=ru_RU&amp;source=appshare&amp;subsource=C104055821" class="icon__link">[\d\D]*?<img src="\/static\/huawei-en\.svg" alt="Huawei" class="app__logo">[\d\D]*?<\/a>[\d\D]*?<\/div>/ig;
   
+   const htmlLink = /href="\/[^\.]*?"/ig;
+
    let file = fs.readFileSync(filePath).toString();
+
+   file = file.replace(htmlLink, (match) => {
+      let path = match.slice(6, match.lastIndexOf('"'));
+
+      if(path.includes('?'))
+         path = path.slice(0, path.lastIndexOf('?'));
+
+      path = `/views${path}${path.length == 1 ? '' : '/'}index.html`;
+
+      console.log(path);
+      return path;
+   });
 
    //file = file.replace(mainRegExp, '');
    //file = file.replace(/<\/head>/ig, '<script src="/_next/static/chunks/main-17e44cbdb5d5a0ca.js" defer=""></script></head>');
    //file = file.replace(/<\/head>/ig, '<script src="/_next/static/chunks/pages/_app-7bb6551620325462.js" defer=""></script></head>');
-   file = file.replace(footer_3RegExp, '');
+   //file = file.replace(footer_3RegExp, '');
 
-   fs.writeFileSync(filePath, file);
+   //fs.writeFileSync(filePath, file);
 });
 
 
