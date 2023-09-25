@@ -16,7 +16,7 @@ const getHtmlPath = (url) => {
 
    const filePath = [...url.split('/'), 'index.html'];
 
-   return path.resolve('views', ...filePath);
+   return path.resolve('static', 'view', ...filePath);
 }
 
 export { getHtmlPath, getPathWidthoutQuery };

@@ -8,9 +8,9 @@ import enRouter from './route/en.js';
 const app = express();
 const port = 3000;
 
-app.set('views', path.resolve('views'));
-app.use(express.urlencoded({'extended': false}));
-app.use(express.static(path.resolve('public')))
+//app.set('views', path.resolve('views'));
+//app.use(express.urlencoded({'extended': false}));
+app.use(express.static(path.resolve('static')))
 
 app.use(blogRouter);
 app.use(enRouter);
