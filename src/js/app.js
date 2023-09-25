@@ -138,6 +138,7 @@ document.addEventListener('DOMContentLoaded', async e => {
 
 
    const ___gcse_0 = document.querySelector('#___gcse_0');
+   ___gcse_0.style.display = 'none';
 
    const checkCapcha = () => {
       if(document.querySelector('#recaptcha-wrapper')){
@@ -200,14 +201,12 @@ document.addEventListener('DOMContentLoaded', async e => {
    const setSearchListeners = () => {
 
       const getInputValue = () => {
-         return input.value.trim();
+         return localStorage.getItem('actualQ');
       }
 
       const getInputValueOrQ = () => {
          const inputValue = getInputValue(); 
          const {q, tab, page} = getQyery();
-
-         //console.log(inputValue);
 
          if(!inputValue && !q)
             return;
@@ -217,23 +216,25 @@ document.addEventListener('DOMContentLoaded', async e => {
          return {'q': res, tab, page};
       }
 
+      input.addEventListener('input', e => localStorage.setItem('actualQ', input.value.trim()));
+
 
       if(!isQueryPage()){
          const handler = () => {
-            try{
-               const {q, tab, page} = getInputValueOrQ();
+            setTimeout(() => {
+               try{
+                  const {q, tab, page} = getInputValueOrQ();
 
-               if(!q)
-                  return;
+                  if(!q)
+                     return;
 
-               const url = `${location.origin}${location.pathname.includes('en') ? '/en' : ''}/search#gsc.q=${q}&gsc.tab=0&gsc.page=1`;
-               saveQyery({q, 'tab': 0, 'page': 1});
+                  const url = `${location.origin}${location.pathname.includes('en') ? '/en' : ''}/search#gsc.q=${q}&gsc.tab=0&gsc.page=1`;
+                  saveQyery({q, 'tab': 0, 'page': 1});
 
-               //console.log(url);
-
-               location.assign(url);
-            }catch{
-            }
+                  location.assign(url);
+               }catch{
+               }
+            }, 0);
          }
 
          input.addEventListener('keydown', e => {
@@ -267,24 +268,25 @@ document.addEventListener('DOMContentLoaded', async e => {
       }else{
 
          const handler = () => {
-            try{
-               const {q, tab, page} = getInputValueOrQ();
-               console.log('-------------');
+            setTimeout(() => {
+               try{
+                  const {q, tab, page} = getInputValueOrQ();
 
-               if(!q)
-                  return;
+                  if(!q)
+                     return;
 
-               let newTab = tab[tab.length - 1] == '&' ? [...tab].shift() : tab;  
+                  let newTab = tab[tab.length - 1] == '&' ? [...tab].shift() : tab;  
 
-               saveQyery({q, 'tab': newTab, page});
+                  saveQyery({q, 'tab': newTab, page});
 
-               const url = location.href.slice(0, location.href.lastIndexOf('#'))
+                  const url = location.href.slice(0, location.href.lastIndexOf('#'))
 
-               location.assign(`${url}#gsc.q=${q}&gsc.tab=${newTab}&gsc.page=${page}`);
-               location.reload();
-            }catch{
+                  location.assign(`${url}#gsc.q=${q}&gsc.tab=${newTab}&gsc.page=${page}`);
+                  location.reload();
+               }catch{
 
-            }
+               }
+            }, 0);
          }
 
          input.addEventListener('keydown', e => {
@@ -316,8 +318,6 @@ document.addEventListener('DOMContentLoaded', async e => {
 
             link.addEventListener('click', e => {
                e.preventDefault();
-
-               
 
                const isSearchLink = () => link.href.includes('/search');
 
@@ -421,18 +421,36 @@ document.addEventListener('DOMContentLoaded', async e => {
       return;
    }
 
+   //___gcse_0.style.display = 'none';
+
    const makeSerpScene = async () => {
 
       const header = document.querySelector('header');
 
       ___gcse_0.style.paddingTop = header.offsetHeight + 'px'; 
 
-      const res = await Promise.race([waitFor(0, '.gs-no-results-result', 2), waitFor(0, '.gsc-tabdActive .gsc-results', 2), waitFor(0, '#recaptcha-wrapper', 2)]);
+      let res = await Promise.race([waitFor(0, '.gsc-tabdActive .gsc-results', 2), waitFor(0, '#recaptcha-wrapper', 2)]);
 
+      console.log(res);
+      // if(res == '.gsc-tabdActive .gsc-results'){
+      //    localStorage.setItem('captch', 0);
+      // }else 
       if(res == '#recaptcha-wrapper'){
-         return false;
+         //localStorage.setItem('captch', 1);
+         ___gcse_0.style.display = 'block';
+         //if(!document.querySelector('.gsc-tabdActive .gsc-results'))
+            return false;
+         // else
+         //    location.reload();
       }
 
+      if(document.querySelector('.gs-no-results-result')){
+         res = '.gs-no-results-result';
+         //console.log('!!');
+      }
+
+      console.log(document.querySelector('.gsc-tabdActive .gsc-results'));
+      console.log(document.querySelector('#recaptcha-wrapper'));
       //if(res == '.gsc-tabdActive .gsc-results'){
 
          const result = document.querySelector('.gsc-tabdActive .gsc-results');
