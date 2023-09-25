@@ -128,14 +128,12 @@ document.addEventListener('DOMContentLoaded', async e => {
       });
    };
 
-
    if(isQueryPage()){
       
       document.body.classList.add('_search');
    }
 
    await waitFor();
-
 
    const ___gcse_0 = document.querySelector('#___gcse_0');
    ___gcse_0.style.display = 'none';
@@ -175,6 +173,8 @@ document.addEventListener('DOMContentLoaded', async e => {
       }else if(document.querySelector('.input__wrap')){
          wrapperSelector = '.input__wrap';
       }
+
+      const clearButton = document.querySelector('.gsib_b');
 
       document.addEventListener('click', e => {
          const el = e.target;
@@ -249,6 +249,8 @@ document.addEventListener('DOMContentLoaded', async e => {
             if(e.code !== 'Enter')
                return;
 
+            localStorage.setItem('actualQ', input.value);
+
             handler();
          });
 
@@ -263,18 +265,21 @@ document.addEventListener('DOMContentLoaded', async e => {
          }else if(document.querySelector('.list-hints')){
             suggests = document.querySelector('.list-hints');
          }
-         
-         suggests.addEventListener('click', e => {
+
+         const suggestsClickHandler = e => {
             const el = e.target;
 
             if(!el.closest('.gsq_a'))
                return;
 
+            localStorage.setItem('actualQ', input.value);
+
             handler();
-         });
-
+         }
+         
+         suggests.addEventListener('click', suggestsClickHandler);
+         suggests.addEventListener('touchstart', suggestsClickHandler);
       }else{
-
          const handler = () => {
             setTimeout(() => {
                try{
@@ -301,28 +306,32 @@ document.addEventListener('DOMContentLoaded', async e => {
             if(e.code !== 'Enter')
                return;
 
+            localStorage.setItem('actualQ', input.value);
+
             handler();
          });
 
-         document.querySelector('.suggestions_suggestions__DgAt8').addEventListener('click', e => {
+         const clickHandler = e => {
             const el = e.target;
 
             if(!el.closest('.gsq_a'))
                return;
 
+            localStorage.setItem('actualQ', input.value);
+
             handler();
-         });
+         }
+
+         const suggestWrapper = document.querySelector('.suggestions_suggestions__DgAt8');
+          
+         suggestWrapper.addEventListener('click', clickHandler);
+         suggestWrapper.addEventListener('touchstart', clickHandler);
 
          inputSubmit.addEventListener('click', handler);
 
          const isQueryLink = url => ['/search?', '/images?', '/video?'].some(href => url.includes(href));
 
          [...document.querySelectorAll('a')].filter(link => isQueryLink(link.href)).forEach(link => {
-            //console.log(link);
-
-            // if(link.href.includes('/video?q=')){
-            //    link.remove();
-            // }else{
 
             link.addEventListener('click', e => {
                e.preventDefault();
@@ -413,13 +422,33 @@ document.addEventListener('DOMContentLoaded', async e => {
    const relocateSuggests = () => {
       const suggests = document.querySelector('.gssb_e');
 
-      //console.log(suggests);
+      let ulWrap;
 
       if(document.querySelector('.suggestions_suggestions__DgAt8'))
-         document.querySelector('.suggestions_suggestions__DgAt8')?.append(suggests) 
+         ulWrap = document.querySelector('.suggestions_suggestions__DgAt8')
       else if(document.querySelector('.list-hints')){
-         document.querySelector('.list-hints').append(suggests);
+         ulWrap = document.querySelector('.list-hints');
       }
+
+      if(!ulWrap)
+         return;
+
+      ulWrap.append(suggests);
+
+      const clickHandler = e => {
+         if(!ulWrap.parentElement.querySelector('._focus')){
+            try{
+               const tbody = ulWrap.querySelector('tbody');
+               tbody.innerHTML = '';
+            }
+            catch{
+
+            }
+         }
+      }
+
+      document.addEventListener('click', clickHandler);
+      document.addEventListener('touchstart', clickHandler);
    }
 
    relocateSuggests();
@@ -659,8 +688,9 @@ document.addEventListener('DOMContentLoaded', async e => {
       }
    }
 
+   setAreaPaddingBottom();
    area.addEventListener('click', setAreaPaddingBottom);
-   window.addEventListener('resize', setAreaPaddingBottom);;
+   window.addEventListener('resize', setAreaPaddingBottom);
 
    const addPagginationListener = () => {
       document.addEventListener('click', async e => {

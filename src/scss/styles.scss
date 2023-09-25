@@ -493,6 +493,13 @@ header{
    border-radius: 5px !important;
    width: 100% !important;
    display: block !important;
+   &>table{
+      &>tbody{
+         &>tr{
+            cursor: pointer !important;
+         }
+      }
+   }
 }
 
 .gsc-completion-selected{
