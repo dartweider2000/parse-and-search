@@ -24,6 +24,9 @@ http://localhost:3000
 
 ```html
 <script async src="https://cse.google.com/cse.js?cx=c2d33ea0d202b48fc"></script>
+```
+
+```html
 <div class="gcse-search"></div>
 ```
 ## Идентификатор поисковой системы
