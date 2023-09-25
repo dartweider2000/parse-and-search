@@ -8,7 +8,7 @@ npm i
 npm run prod
 ```
 __2.__ Вбейте URL в своём браузере:
-```http
+```bash
 http://localhost:3000
 ```
 
@@ -23,11 +23,11 @@ http://localhost:3000
 ## Код custom search
 
 ```html
-<script async src="https://cse.google.com/cse.js?cx=c2d33ea0d202b48fc"><script>
+<script async src="https://cse.google.com/cse.js?cx=c2d33ea0d202b48fc"></script>
 <div class="gcse-search"></div>
 ```
 ## Идентификатор поисковой системы
 
-```
+```bash
 c2d33ea0d202b48fc
 ```
