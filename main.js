@@ -91,14 +91,16 @@ filePathList.forEach(filePath => {
    // });
 
    file = file.replace(otherLink, (match) => {
-      let path = match.slice(7, match.length - 1);
+      let path = match.slice(7);
 
       // if(path.includes('?'))
       //    path = path.slice(0, path.lastIndexOf('?'));
 
       //path = `/views${path}${path.length == 1 ? '' : '/'}index.html`;
 
+      path = `/images-picture${path}`;
       console.log(path);
+
       return path;
    });
 
@@ -107,7 +109,7 @@ filePathList.forEach(filePath => {
    //file = file.replace(/<\/head>/ig, '<script src="/_next/static/chunks/pages/_app-7bb6551620325462.js" defer=""></script></head>');
    //file = file.replace(footer_3RegExp, '');
 
-   //fs.writeFileSync(filePath, file);
+   fs.writeFileSync(filePath, file);
 });
 
 

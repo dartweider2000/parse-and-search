@@ -1,6 +1,6 @@
 
 
-const isQueryPage = () => location.href.includes('/search') || location.href.includes('/images') || location.href.includes('/video');
+const isQueryPage = () => location.pathname.includes('/search') || location.pathname.includes('/images');
 const getQyery = () => {
    const qRegExp = /gsc\.q=[\d\D]*?(&|\s)*?/ig;
    const tabRegExp = /gsc\.tab=[\d\D]+?(&|\s)*?/ig;
@@ -133,18 +133,22 @@ document.addEventListener('DOMContentLoaded', async e => {
       document.body.classList.add('_search');
    }
 
+   const clearUselessParthsGSC = () => {
+      if(document.querySelector('.gsc-positioningWrapper')){
+         document.querySelector('.gsc-positioningWrapper').style.display = 'none';
+      }
+
+      if(document.querySelector('.gsc-above-wrapper-area')){
+         document.querySelector('.gsc-above-wrapper-area').style.display = 'none';
+      }
+   } 
+
    await waitFor();
 
    const ___gcse_0 = document.querySelector('#___gcse_0');
    ___gcse_0.style.display = 'none';
 
-   if(document.querySelector('.gsc-positioningWrapper')){
-      document.querySelector('.gsc-positioningWrapper').style.display = 'none';
-   }
-
-   if(document.querySelector('.gsc-above-wrapper-area')){
-      document.querySelector('.gsc-above-wrapper-area').style.display = 'none';
-   }
+   clearUselessParthsGSC();
 
    const checkCapcha = () => {
       if(document.querySelector('#recaptcha-wrapper')){
@@ -356,7 +360,6 @@ document.addEventListener('DOMContentLoaded', async e => {
 
                location.assign(url);
             })
-         //}
          });
 
       }
@@ -393,6 +396,11 @@ document.addEventListener('DOMContentLoaded', async e => {
 
       let {q, page} = loadQyery();
 
+      let url = location.href;
+      const pathName = location.pathname;
+
+      const withOutHashUrl = `${url.slice(0, url.indexOf(pathName))}${pathName}`;
+
       if(isQueryPage()){
 
          let {q: Q, page: Page} = getQyery();
@@ -404,16 +412,15 @@ document.addEventListener('DOMContentLoaded', async e => {
 
          if(Page > 10)
             Page = 10;
-   
-         const url = location.href;
 
-         location.assign(`${url.slice(0, url.lastIndexOf('#'))}#gsc.q=${Q || q || ''}&gsc.tab=${url.includes('/search') ? 0 : 1}&gsc.page=${(Page || page || '1')}`);
+         url = `${url.slice(0, url.indexOf(pathName))}${pathName}`;
+
+         location.assign(`${withOutHashUrl}#gsc.q=${Q || q || ''}&gsc.tab=${location.pathname.includes('/search') ? 0 : 1}&gsc.page=${(Page || page || '1')}`);
       }else{
          saveQyery({'q': '', 'tab': 0, 'page': 1});
-         const newUrl = `${location.href.slice(0, location.href.lastIndexOf('#'))}`;
 
          input.value = '';
-         history.replaceState(null, null, newUrl);
+         history.replaceState(null, null, withOutHashUrl);
       }
    }
 
@@ -463,17 +470,11 @@ document.addEventListener('DOMContentLoaded', async e => {
 
       ___gcse_0.style.paddingTop = header.offsetHeight + 'px'; 
 
+      clearUselessParthsGSC();
+
       let res = await Promise.race([waitFor(0, '.gs-no-results-result', 2), waitFor(0, '.gsc-tabdActive .gsc-results', 2), waitFor(0, '#recaptcha-wrapper', 2)]);
 
-
-      if(document.querySelector('.gsc-positioningWrapper')){
-         document.querySelector('.gsc-positioningWrapper').style.display = 'none';
-      }
-   
-      if(document.querySelector('.gsc-above-wrapper-area')){
-         document.querySelector('.gsc-above-wrapper-area').style.display = 'none';
-      }
-
+      clearUselessParthsGSC();
 
       if(res == '#recaptcha-wrapper'){
 
@@ -542,8 +543,6 @@ document.addEventListener('DOMContentLoaded', async e => {
          if(location.pathname.includes('/search')){
             resizeHandler();
          }
-
-      // checkCapcha();
       });
 
       observer.observe(area, {
