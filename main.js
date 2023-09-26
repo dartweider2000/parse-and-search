@@ -22,26 +22,44 @@ const urlQueue = ['/'];//['/search?q=123'];
 
 const filePathList = [];
 
+const fileRegExp = /[^\.]+?\.[^\.]+?/ig;
+const cssJsHtmlRegExp = /[^\.]+?\.(css|js|html)$/ig;
+
 const look = (dirPath) => {
+
+   //console.log(dirPath);
 
    const dirContentList = fs.readdirSync(dirPath);
 
    const {dirList, fileList} = dirContentList.reduce((res, value) => {
 
-      if(value.endsWith('.html'))
+      // if(value.endsWith('.html'))
+      //    res.fileList.push(value);
+      // else
+      //    res.dirList.push(value);
+      // const isTrue = fileRegExp.test(value);
+      // console.log(isTrue, value);
+      
+      if(value.match(cssJsHtmlRegExp)?.[0]){
          res.fileList.push(value);
-      else
+         //console.log('!!!!');
+      }else if(!value.match(fileRegExp)?.[0]){
          res.dirList.push(value);
-
+         //console.log('-----');
+      }
       return res;
    }, {'fileList': [], 'dirList': []});
 
    fileList.forEach(fileName => filePathList.push(path.resolve(dirPath, fileName)));
 
+   // console.log(dirList);
+   // console.log(fileList);
    dirList.forEach(dirName => look(path.resolve(dirPath, dirName)));
 }
 
-look(path.resolve('public', 'views'));
+look(path.resolve('public'));
+
+
 
 //console.log(filePathList);
 
@@ -56,15 +74,29 @@ filePathList.forEach(filePath => {
   
    const htmlLink = /href="\/[^\.]*?"/ig;
 
+   const otherLink = /\/images\/[^.]*?\.[^.]+?("|'|&|\))/ig;
+
    let file = fs.readFileSync(filePath).toString();
 
-   file = file.replace(htmlLink, (match) => {
-      let path = match.slice(6, match.lastIndexOf('"'));
+   // file = file.replace(htmlLink, (match) => {
+   //    let path = match.slice(6, match.lastIndexOf('"'));
 
-      if(path.includes('?'))
-         path = path.slice(0, path.lastIndexOf('?'));
+   //    if(path.includes('?'))
+   //       path = path.slice(0, path.lastIndexOf('?'));
 
-      path = `/views${path}${path.length == 1 ? '' : '/'}index.html`;
+   //    path = `/views${path}${path.length == 1 ? '' : '/'}index.html`;
+
+   //    console.log(path);
+   //    return path;
+   // });
+
+   file = file.replace(otherLink, (match) => {
+      let path = match.slice(7, match.length - 1);
+
+      // if(path.includes('?'))
+      //    path = path.slice(0, path.lastIndexOf('?'));
+
+      //path = `/views${path}${path.length == 1 ? '' : '/'}index.html`;
 
       console.log(path);
       return path;
