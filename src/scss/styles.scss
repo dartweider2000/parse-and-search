@@ -518,6 +518,11 @@ header{
    padding-top: 5px !important;
    padding-bottom: 5px !important;
    padding-left: 30px !important;
+
+   @media(hover: none){
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+   }
 }
 
 .gsq_a{

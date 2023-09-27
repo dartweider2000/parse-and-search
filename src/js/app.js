@@ -158,6 +158,8 @@ document.addEventListener('DOMContentLoaded', async e => {
 
    let inputSubmit;
 
+   const input = document.querySelector('.gsc-input-box input');
+
    const setSearchPlace = () => {  
       const inputSearch = document.querySelector('.gsc-input-box');
       //let inputSubmit;
@@ -180,16 +182,26 @@ document.addEventListener('DOMContentLoaded', async e => {
 
       const clearButton = document.querySelector('.gsib_b');
 
-      document.addEventListener('click', e => {
-         const el = e.target;
+      // document.addEventListener('click', e => {
+      //    const el = e.target;
 
-         if(inputSearch.classList.contains('_focus') && !el.closest('.gsc-input-box .gsib_a')){
-            inputSearch.classList.remove('_focus');
-         }else if(el.closest('.gsc-input-box .gsib_a')){
-            inputSearch.classList.add('_focus');
-         }
+      //    if(inputSearch.classList.contains('_focus') && !el.closest('.gsc-input-box .gsib_a')){
+      //       inputSearch.classList.remove('_focus');
+      //    }else if(el.closest('.gsc-input-box .gsib_a')){
+      //       inputSearch.classList.add('_focus');
+      //    }
 
+      // });
+
+      input.addEventListener('focusin', e => {
+         inputSearch.classList.add('_focus');
       });
+
+      input.addEventListener('focusout', e => {
+         inputSearch.classList.remove('_focus');
+      });
+
+      //input.dispatchEvent(new Event('focusin'));
 
       if(document.querySelector('#query')){
          document.querySelector('#query')?.replaceWith(inputSearch)
@@ -208,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async e => {
 
    setSearchPlace();
 
-   const input = document.querySelector('.gsc-input-box input');
+   // const input = document.querySelector('.gsc-input-box input');
 
    const setSearchListeners = () => {
 
@@ -276,13 +288,15 @@ document.addEventListener('DOMContentLoaded', async e => {
             if(!el.closest('.gsq_a'))
                return;
 
+            e.stopPropagation();
+
             localStorage.setItem('actualQ', input.value);
 
             handler();
          }
          
          suggests.addEventListener('click', suggestsClickHandler);
-         suggests.addEventListener('touchstart', suggestsClickHandler);
+         //suggests.addEventListener('touchstart', suggestsClickHandler);
       }else{
          const handler = () => {
             setTimeout(() => {
