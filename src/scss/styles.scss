@@ -531,6 +531,8 @@ header{
    border: none !important;
    border-radius: 5px !important;
    box-shadow: 0 0 3px 0 var(--text) !important;
+
+   z-index: 999999999999999 !important;
 }
 
 .gssb_a, .gssb_a td{
@@ -573,6 +575,8 @@ header{
    //padding-left: 20px !important; 
    //padding: 10px !important;
    overflow: visible !important;
+
+   z-index: 999999999999999999 !important;
 
    .gssb_e{
       //padding: 10px !important;
