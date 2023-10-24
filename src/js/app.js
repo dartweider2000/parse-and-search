@@ -113,6 +113,9 @@ document.addEventListener('DOMContentLoaded', async e => {
             try{
                if(type == 1 && google || type == 2 && document.querySelector(target)){
                   clearInterval(interval);
+                  // console.log(gsce, '!!!');
+                  // console.log(google);
+                  // console.log(gsce, '!!!');
                   resolve(target);
                }
       
@@ -379,7 +382,11 @@ document.addEventListener('DOMContentLoaded', async e => {
       }
    }
 
+   //console.log('1');
+
    setSearchListeners();
+
+   //console.log('2');
 
    const addClearButtonListener = () => {
       if(isQueryPage()){
@@ -404,6 +411,8 @@ document.addEventListener('DOMContentLoaded', async e => {
       }
    }
 
+   //console.log('3');
+
    addClearButtonListener();
 
    const loadWithParams = () => {
@@ -413,9 +422,13 @@ document.addEventListener('DOMContentLoaded', async e => {
       let url = location.href;
       const pathName = location.pathname;
 
+     // console.log(pathName, 'pathName');
+
       const withOutHashUrl = `${url.slice(0, url.indexOf(pathName))}${pathName}`;
 
       if(isQueryPage()){
+
+         //console.log('not');
 
          let {q: Q, page: Page} = getQyery();
 
@@ -431,17 +444,33 @@ document.addEventListener('DOMContentLoaded', async e => {
 
          location.assign(`${withOutHashUrl}#gsc.q=${Q || q || ''}&gsc.tab=${location.pathname.includes('/search') ? 0 : 1}&gsc.page=${(Page || page || '1')}`);
       }else{
+         //console.log('else');
          saveQyery({'q': '', 'tab': 0, 'page': 1});
 
          input.value = '';
-         history.replaceState(null, null, withOutHashUrl);
+
+         try{
+            //console.log(withOutHashUrl);
+            //console.log(history);
+            history.replaceState(null, null, withOutHashUrl);
+         }
+         catch(err){
+            //console.log(err.message, 'err');
+         }
       }
    }
+
+   //console.log('4');
 
    loadWithParams();
 
    const relocateSuggests = () => {
+      //console.log('++++');
       const suggests = document.querySelector('.gssb_e');
+
+      //console.log('!!');
+      //console.log(suggests);
+      //console.log('--');
 
       let ulWrap;
 
@@ -472,7 +501,11 @@ document.addEventListener('DOMContentLoaded', async e => {
       document.addEventListener('touchstart', clickHandler);
    }
 
+   //console.log('5');
+
    relocateSuggests();
+
+   //console.log('6');
 
    if(!isQueryPage()){
       ___gcse_0.style.display = 'none';

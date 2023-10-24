@@ -10,7 +10,8 @@
 }
 
 .intro:after {
-	background: var(--main-bg-color);
+	/* background: var(--main-bg-color);*/
+	background: var(--bacground); 
 }
 
 .intro__leaf {
