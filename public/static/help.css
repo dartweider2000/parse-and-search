@@ -311,8 +311,10 @@ body {
 	opacity: 1;
 }
 
+@media(hover: hover){
+
 .header:hover {
-	background: var(--main-bg-color);
+	/* background: var(--main-bg-color); */
 	-webkit-box-shadow: 0 3px 3px var(--results-videos__item-color);
 	box-shadow: 0 3px 3px var(--results-videos__item-color);
 }
@@ -323,6 +325,8 @@ body {
 .header:hover .btn {
 	visibility: visible;
 	opacity: 1;
+}
+
 }
 
 .btn {
