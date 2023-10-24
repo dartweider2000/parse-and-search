@@ -764,6 +764,10 @@ header{
    }
 }
 
+form input{
+   height: 1.5em !important;
+}
+
 .gsc-completion-selected{
    .gssb_a {
       background-color: var(--suggestion-hover) !important;
